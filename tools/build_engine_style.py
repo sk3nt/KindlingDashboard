@@ -29,6 +29,32 @@ RULES = [
     ("Materials", "Honey limestone, lime plaster, terracotta roofs and pots, weathered timber, worn stone steps and cobbles. Clean and lived-in, never grimy."),
     ("Characters", "Costumes read against the stone: Tomas in teal stripes, Ines in cream, the Mayor in red, orange and gold patchwork, Tally in olive and orange."),
 ]
+KEYS = [
+    ("Village dawn (base key)", "The square as measured above. Warm, pink and peach, accents bright.", "Have it"),
+    ("Midday", "Higher contrast, shorter shadows, bluer sky, stone near white. Accents look flatter.", "To write"),
+    ("Dusk", "Deeper orange sun, long shadows, windows and lanterns turn on in amber.", "To write"),
+    ("Night", "Stone drops to blue grey, accents almost vanish; amber windows and Ora green carry the frame.", "To write"),
+    ("Weather: overcast and rain", "Soft light, wet dark stone with reflections, accents become the brightest thing.", "To write"),
+    ("Castle", "Cooler grey stone, the Mayor's red and gold only, harder shadows, wider sky.", "To write"),
+    ("Beach and tide pools", "Pale sand, sea teal, Ora glow in the pools at dawn.", "To write"),
+    ("Woodland areas 1 to 5", "One key each, so the five feel different: light through canopy, own accent.", "To write"),
+    ("Village struggling, then thriving", "Story state: at first, faded cloth, empty stalls, few lit windows. As the village thrives and farms Ora: fresh colour, busy stalls, more light.", "To write"),
+    ("Interiors", "Window light as key, warm bounce, darker corners.", "To write"),
+]
+CONST = ["Ora green means Ora, in every key", "The materials and the shape language", "Gameplay cues: climbable edges, interactables and hazards read the same everywhere",
+         "The accent cap: saturated colour stays a small share of the frame", "Character costume colours"]
+MISSING = [
+    ("Shape language", "Soft, crooked, hand-made shapes for the village; straight, heavy, angular shapes for the castle; each character's silhouette readable at game distance."),
+    ("Value and readability", "Where the darkest and lightest values sit, so the player, the path and the next climbable edge always read first."),
+    ("Gameplay cues", "One visual language for what can be climbed, used or picked up, and for danger, so no on-screen markers are needed."),
+    ("Scale", "Doors, steps, ledges and ropes sized to the 1.80 m hero and the parkour moves (with Daniel)."),
+    ("Materials", "The material library (S6): which stone, plaster, timber, metal and cloth, wear levels and texel density per tier."),
+    ("Camera and lens", "Game camera field of view and height versus the cinematic look of the film frames."),
+    ("VFX", "How Ora glow, dust, water, fire and impacts look (Vera)."),
+    ("Bystanders", "Villagers dressed in muted colours so the four main characters stand out."),
+    ("Reference boards", "Approved and rejected images for each rule, side by side."),
+    ("UI and type", "Later, once there is a game to put it on."),
+]
 DONT = ["Neon or fully saturated colour over large areas", "Grey, cold or blue-hour light", "Green used for anything that is not Ora",
         "Repeated banner sets across locations", "Text, signs or logos in the world"]
 
@@ -39,6 +65,9 @@ def sw(name, hx):
 
 groups = "".join(f'<div class="swg"><h4>{E(t)}</h4><p class="o">{E(d)}</p><ul class="sws">{"".join(sw(*s) for s in ss)}</ul></div>' for t, d, ss in GROUPS)
 rules = "".join(f"<li><b>{E(a)}.</b> {E(b)}</li>" for a, b in RULES)
+keys = "".join(f"<tr><td><b>{E(a)}</b></td><td>{E(b)}</td><td>{E(c)}</td></tr>" for a, b, c in KEYS)
+consts = "".join(f"<li>{E(x)}</li>" for x in CONST)
+missing = "".join(f"<li><b>{E(a)}.</b> {E(b)}</li>" for a, b in MISSING)
 donts = "".join(f"<li>{E(x)}</li>" for x in DONT)
 
 SECTION = f'''<!--style:start-->
@@ -50,8 +79,14 @@ SECTION = f'''<!--style:start-->
   {groups}
   <h3 class="ch3">Rules</h3><ul class="srules">{rules}</ul>
   <h3 class="ch3">Never</h3><ul class="srules">{donts}</ul>
+  <h3 class="ch3">Variation: look keys</h3>
+  <p class="o">The world does not look like the square all the time. Each place, time of day, weather and story state gets a look key: one reference frame plus how it shifts from the base key. Astrid, the Art Director, writes the keys, Steven approves them, and Astrid judges every new frame against the key it belongs to.</p>
+  <div class="tablewrap"><table class="keys"><thead><tr><th>Key</th><th>How it shifts from the base</th><th>State</th></tr></thead><tbody>{keys}</tbody></table></div>
+  <p class="o" style="margin-top:12px"><b>Stays the same in every key:</b></p><ul class="srules">{consts}</ul>
+  <h3 class="ch3">Still to write</h3><ul class="srules">{missing}</ul>
   <div class="todo"><h3 class="ch3">Next to do</h3><ol class="nexts">
     <li><b>Steven approves or changes the palette and rules.</b></li>
+    <li><b>Astrid writes the first look keys:</b> night and the castle first (most different from the base), then the struggling and thriving village.</li>
     <li><b>Write it into the repo style guide</b> (a gated file: Steven accepts the change, and earlier gate results are re-run).</li>
     <li><b>Lena builds the post-process grade</b> that turns the photoreal render into this palette, tested on one Unity scene per quality tier.</li>
     <li><b>Astrid adds a palette check</b> to her look gate: accent share and Ora-green misuse, measured on each new frame.</li>
@@ -65,6 +100,7 @@ CSS = '''/*style:start*/
 ul.sws{list-style:none;margin:10px 0 0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
 .sw{background:#EEF0EE;padding:8px}.sw .chip{display:block;height:64px;border:1px solid rgba(0,0,0,.15);margin-bottom:6px}
 .sw b{display:block;font-size:14px}.sw code{font-size:12.5px;color:var(--slag-2)}
+table.keys{border-collapse:collapse;width:100%;max-width:980px;margin-top:10px;font-size:14.5px}table.keys th,table.keys td{text-align:left;vertical-align:top;padding:8px 10px;border-bottom:1px solid var(--ash-2)}@media (min-width:700px){table.keys td:first-child{white-space:nowrap}}
 ul.srules{margin:8px 0 0;padding-left:20px;max-width:900px}ul.srules li{margin:0 0 6px;font-size:15px}
 /*style:end*/'''
 
