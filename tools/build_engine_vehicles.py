@@ -14,9 +14,9 @@ E = html.escape
 IMG = ROOT / "img" / "vehicles"
 FS = "in a woodland clearing south of the river, the village terraces and the castle cliff far behind"
 DL = re.search(r"^DESIGN LANGUAGE \(paste into every vehicle prompt\): (.*)$", TXT, re.M).group(1)
-P = dict(re.findall(r"^((?:QB|SB|CW|BT)-[A-Z]+): (.*)$", TXT, re.M))
-VEH = [("QB", "quad", "Quad bike", "First vehicle"), ("SB", "scout", "Scout bike", "Two wheels, for the woodland paths"),
-       ("CW", "walker", "Cargo walker", "Four legs, for steps and terraces; carries Ora"), ("BT", "boat", "Boat", "For the harbour and the river ring")]
+P = dict(re.findall(r"^((?:QB|SB|CW|BT|GL)-[A-Z]+): (.*)$", TXT, re.M))
+VEH = [("QB", "quad", "Quad bike", "First vehicle; zone 1"), ("SB", "scout", "Scout bike", "Two wheels, for the woodland paths; zone 2"),
+       ("CW", "walker", "Cargo walker", "Four legs, for steps and terraces; carries Ora; zone 3"), ("BT", "boat", "Boat", "For the harbour and the river ring; zone 4"), ("GL", "glider", "Glider", "From the sea cliffs; zone 5")]
 STEPS = [("CONCEPT", "Concept"), ("SHEET", "Sheet"), ("ACTION", "In action"), ("DETAILS", "Details")]
 
 
@@ -47,7 +47,7 @@ refs = "".join(f'<li class="cc"><div class="cl">{E(l)}</div><a class="im" href="
 SECTION = f'''<!--vehicles:start-->
 <section id="vehicles"><div class="wrap">
   <h2>Look development: vehicles</h2>
-  <p class="lede">Vehicles are alien-built, once supplied through the orbiting space station; only Tomas and Ines ride them. They share Tally's design language and run on Ora. The quad bike comes first, then the scout bike, cargo walker and boat. Prompts in the game repo, <code>Production/Design/prompts/vehicle-prompts.md</code>.</p>
+  <p class="lede">Vehicles are alien-built, once supplied through the orbiting space station; only Tomas and Ines ride them. They share Tally's design language and run on Ora. The quad bike comes first, then the scout bike, cargo walker, boat and glider, one in each woodland faction. Prompts in the game repo, <code>Production/Design/prompts/vehicle-prompts.md</code>.</p>
   <h3 class="ch3">Design references: Tally</h3>
   <ol class="cstrip envref">{refs}</ol>
   <h3 class="ch3">Design language</h3>
@@ -57,8 +57,8 @@ SECTION = f'''<!--vehicles:start-->
   <div class="todo"><h3 class="ch3">Next to do</h3><ol class="nexts">
     <li><b>Generate the quad bike concept</b> with the Tally plate, the Tally poster and the village square attached.</li>
     <li><b>The sheet</b> once Steven approves the concept; Theo checks it for modelling, Daniel for scale in the lanes.</li>
-    <li><b>Then the scout bike, cargo walker and boat concepts,</b> each as found in the world.</li>
-    <li><b>Steven:</b> four vehicles for five factions, so a fifth vehicle or one faction without one; and which faction holds which.</li>
+    <li><b>Then the scout bike, cargo walker, boat and glider concepts,</b> each as found in the world.</li>
+    <li><b>Glider added</b> so each of the five factions holds one vehicle (integrator's choice, reversible until the factions are written).</li>
   </ol></div>
 </div></section>
 <!--vehicles:end-->'''

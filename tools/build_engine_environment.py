@@ -10,6 +10,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 GAME = Path(sys.argv[1] if len(sys.argv) > 1 else os.environ.get("KINDLING_GAME", ROOT.parent / "KindlingDiscovery"))
+WTXT = (GAME / "Production" / "Design" / "prompts" / "world-map-prompts.md").read_text(encoding="utf-8")
+WMAP = re.findall(r"^(MAP-[A-Z0-9-]+): (.*)$", WTXT, re.M)
+WLAYOUT = re.findall(r"^- ([^:]+): (.*)$", WTXT.split("## The layout I chose", 1)[1].split("## Prompt 1", 1)[0], re.M)
 TXT = (GAME / "Production" / "Design" / "prompts" / "environment-prompts.md").read_text(encoding="utf-8")
 E = html.escape
 IMG = ROOT / "img" / "environment"
@@ -91,12 +94,17 @@ SECTION = f'''<!--environment:start-->
   <h3 class="ch3">Real-world references</h3>
   <p class="o">Places that look like ours, used for ideas only. Prompts describe the feature and never name the place, so the generator does not copy a real landmark.</p>
   <ul class="envrefs">{refhtml}</ul>
+  <div class="crow" id="env-world"><h3>World map <small>8 by 8 km, top down</small></h3>
+  <p class="o">The Episode 01 sketch is one square kilometre, the north-east corner. The rest is a proposal for Steven, Leo and Nora. Prompts in <code>Production/Design/prompts/world-map-prompts.md</code>.</p>
+  <ul class="envrefs">{"".join(f"<li><b>{E(a)}.</b> {E(b)}</li>" for a, b in WLAYOUT)}</ul>
+  <ol class="cstrip envgrid" style="margin-top:12px">{"".join(f'<li class="cc"><div class="cl">{E(k.replace("MAP-", "").replace("-", " ").title())}</div>{image(k.lower(), k)}<details class="pr"><summary><span class="snip">{E(snip(t))}</span><span class="more">Full prompt</span></summary><pre>{E(t)}</pre></details></li>' for k, t in WMAP)}</ol></div>
   <div class="crow"><h3>Village: key locations</h3><ol class="cstrip envgrid">{group(r"V\d")}</ol></div>
   <div class="crow"><h3>Castle: key locations</h3><ol class="cstrip envgrid">{group(r"C\d")}</ol></div>
   <div class="crow"><h3>Isolated key structures</h3><p class="o">Grid modules (house walls, stairs, roofs, terraces) become procedural kits later; their sheets are the look reference. Landmarks can be meshed from the sheet.</p><ol class="cstrip envgrid">{group(r"S-")}</ol></div>
   <div class="crow"><h3>Props</h3><p class="o">Props marked E4 are the first five to build. No stock game props: no barrels, crates, sacks or chests.</p><ol class="cstrip envgrid">{group(r"P\d")}</ol></div>
   <div class="todo"><h3 class="ch3">Next to do</h3><ol class="nexts">
     <li><b>Clean plates</b> for the frames that have a character in them: V2, V3, C1, C2, C3 (same camera, character removed).</li>
+    <li><b>The world map:</b> generate the photoreal map first, then the illustrated one from it; Leo checks the layout against the Episode 01 sketch.</li>
     <li><b>V0, the village establishing shot,</b> from the layout of record, with the square plate attached for the look.</li>
     <li><b>Village plates V4 to V7,</b> then castle plates C0, C4 and C5.</li>
     <li><b>Structure sheets,</b> landmarks first: S-V4 market stall, the bridge (S-V5 or S-V10), S-C1 gatehouse, S-C4 keep, S-C6 gate tunnel.</li>
