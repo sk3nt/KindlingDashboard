@@ -18,10 +18,6 @@ STEPS = [("concept", "Concept"), ("plate", "Plate"), ("intro", "Photoreal intro"
 CHARS = [("tomas", "Tomas", "The hero"), ("ines", "Ines", "His twin sister"), ("mayor", "The Mayor", "Episode 1 boss"), ("tally", "Tally", "The Charge-walker companion")]
 NOTE = {
     ("ines", "concept"): "Prompt not recorded in the repo.",
-    ("tomas", "closeup"): "Prompt not recorded in the repo.",
-    ("ines", "closeup"): "Prompt not recorded in the repo.",
-    ("mayor", "closeup"): "Prompt not recorded in the repo.",
-    ("tally", "closeup"): "No close-up made yet.",
 }
 
 
@@ -48,6 +44,12 @@ def edit_block(sec):
 
 
 plates = read("character-plates-prompt-pack.md")
+closeup = read("closeup-prompts.md")
+def cline(prefix):
+    for ln in closeup.splitlines():
+        if ln.startswith(prefix):
+            return ln.split("): ", 1)[1].strip() if ")" in prefix or "(" in ln.split(":")[0] else ln[len(prefix):].strip()
+    raise KeyError(prefix)
 intro = read("character-intro-prompts.md")
 poster = read("live-action-poster-prompts.md")
 hero = read("hero-plate-prompt-pack.md")
@@ -66,12 +68,13 @@ clean = poster[poster.index("## REALISM-FIRST CLEAN SET"):]
 tomas_poster = line(clean, "TOMAS:")
 poster_open = tomas_poster.split(". ")[0] + "."
 poster_close = re.search(r"(Natural soft light, soft shadows.*)$", tomas_poster).group(1)
+_ct = next(ln for ln in closeup.splitlines() if ln.startswith("TOMAS:")).split(":", 1)[1].strip()
 COMMON = {
     "concept": concept_common,
     "plate": "APOSE: " + APOSE + "\n\nTAIL: " + TAIL,
     "intro": FRAME,
     "poster": poster_open + " [character and scene] " + poster_close,
-    "closeup": "Prompt not recorded in the repo.",
+    "closeup": "Using the [character] in the reference image, create a tight, full-frame close-up of the head and shoulders, shot like a live-action feature film still. [Same character: face, hair, costume.] Calm, focused expression, eyes locked on the camera, eyes in the upper third, sharp with clear catchlights. Real skin: pores, freckles, natural uneven tone. Low golden sun as a warm rim light, soft cool fill. Background softly out of focus. Large-format cinema lens, shallow depth of field, fine film grain, true-to-life colour, no beauty retouching look. (Ines and the Mayor also attach the Tomas close-up as a second reference: same look, framing, lens, lighting and grade.) The 4K file is then a local upscale, with no prompt.",
 }
 
 # --- per character --------------------------------------------------------------------
@@ -99,6 +102,11 @@ for ch, key in (("tomas", "HERO"), ("ines", "INES"), ("mayor", "MAYOR"), ("tally
         base = p_plate("HERO")[0]
         P[(ch, "plate")] = ("Base sheet prompt (written for Tomas):\n" + base + "\n\nAdapt it for this character:\n" + P[(ch, "plate")][0], P[(ch, "plate")][1])
     P[(ch, "intro")] = p_intro(nk)
+    ck = {"tomas": "TOMAS", "ines": "INES", "mayor": "MAYOR", "tally": "TALLY"}[ch]
+    ct = next(ln for ln in closeup.splitlines() if ln.startswith(ck + " ") or ln.startswith(ck + ":"))
+    ct = ct.split("): ", 1)[1] if "): " in ct.split(":")[0] + "):" and ct.startswith(ck + " (") else ct.split(":", 1)[1]
+    ct = ct.strip()
+    P[(ch, "closeup")] = (ct, ct)
     ptxt = line(clean, nk + ":")
     P[(ch, "poster")] = (ptxt, ptxt)
 
@@ -126,7 +134,8 @@ def card(ch, st, label, gen_hint=False):
               f'<img src="img/characters/{ch}-{st}.webp" alt="{E(name)}, {E(label.lower())}" loading="lazy"></a>')
     else:
         im = '<div class="im gen" role="img" aria-label="Not generated yet"><span>Generate</span></div>'
-    return f'<li class="cc"><div class="cl">{E(label)}</div>{im}{pr}</li>'
+    k4 = '<p class="np">4K file: local upscale, no prompt.</p>' if st in ("poster", "closeup") and f.exists() else ""
+    return f'<li class="cc"><div class="cl">{E(label)}</div>{im}{pr}{k4}</li>'
 
 
 rows = []
@@ -148,6 +157,16 @@ SECTION = f'''<!--characters:start-->
   <p class="o">Each step starts from one shared prompt. A character adds only its own description.</p>
   <ol class="cprompts">{common_html}</ol>
   {"".join(rows)}
+  <div class="todo"><h3 class="ch3">Next to do: sharpen the images</h3>
+  <p class="o">The posters and close-ups were generated at about 843 by 1264 to 1024 by 1536 pixels. The 4K files are a local upscale: they are 4K by size but soft at 100% zoom, and cannot invent detail.</p>
+  <ol class="nexts">
+    <li><b>Make the Tally close-up.</b> The prompt is written and shown above. The poster prompt was blocked earlier, so it avoids the words "robot" and "visor".</li>
+    <li><b>Run the quality-pass prompt.</b> Attach each poster or close-up in the image generator and ask for an IMAX-quality, HDR-look re-render that keeps the pose, face and props. Then run the 4K and HDR10 pass on the result. The prompt is in <code>Production/Design/prompts/closeup-prompts.md</code>.</li>
+    <li><b>Test a generative upscaler on one face.</b> Magnific and Topaz can add real detail where the local pass cannot. Compare both against the local pass at 100% on Tomas's close-up. Both are paid, so the spend cap is Steven's to set.</li>
+    <li><b>Test a free local upscaler.</b> Real-ESRGAN is the free option. It is not installed in the workspace yet. Same one-face comparison.</li>
+    <li><b>Generate larger originals where the tool allows it.</b> More native pixels beat any upscaler. Check the maximum output size in each generator.</li>
+    <li><b>Pick one method and write it down as a standard.</b> The winner becomes the 4K step for every character, so the Next character row follows the same path.</li>
+  </ol></div>
 </div></section>
 <!--characters:end-->'''
 
@@ -170,6 +189,7 @@ a.im{cursor:zoom-in}a.im:focus-visible{outline:3px solid var(--ember)}
 .im.gen span{font-weight:700;color:var(--slag-2);background:#EEF0EE;padding:6px 14px;border:2px solid var(--slag-2)}
 .np{font-size:13px;color:var(--slag-2);margin:8px 0 0}.cc .pr{margin-top:8px}
 .crow.next .cl{color:var(--slag-2)}
+.todo{margin-top:40px;max-width:900px}.todo ol.nexts{margin:12px 0 0;padding-left:22px;border:0;list-style:decimal}.todo li{margin:0 0 8px;font-size:15px}.todo code{font-size:13px;background:#EEF0EE;padding:1px 5px}
 .rp{margin-top:10px;background:#fff;border:1px solid var(--ash-2);border-left:6px solid var(--ember);padding:12px 16px;max-width:980px}
 .rp b{display:block;font-size:14px;margin-bottom:6px}
 .rp pre{white-space:pre-wrap;word-break:break-word;font:13px/1.55 ui-monospace,Consolas,monospace;margin:0;max-height:420px;overflow:auto}
