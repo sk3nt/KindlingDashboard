@@ -154,12 +154,18 @@ def main():
 TEMPLATE = r"""<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Kindling: engine development</title>
+<script src="shared/sitenav.js" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..800&display=swap" rel="stylesheet">
 <style>
 :root{--ash:#E3E6E3;--ash-2:#D5D9D5;--card:#EEF0EE;--slag:#22292E;--slag-2:#4A545B;
 --done:#2A8F55;--review:#6FB98A;--active:#D9622B;--ready:#3B6E8F;--blocked:#9AA5AD;--steven:#C98A12;--parked:#B9BFC3}
-*{box-sizing:border-box}body{margin:0;background:var(--ash);color:var(--slag);font:400 15.5px/1.5 "Archivo",system-ui,sans-serif}
+*{box-sizing:border-box}[id]{scroll-margin-top:calc(var(--sitenav-h,0px) + 60px)}
+.pnav{position:sticky;top:var(--sitenav-h,0px);z-index:4;background:var(--ash);border-bottom:1px solid #C3C9C5;margin:0 -24px;padding:0 24px}
+.pnav ul{list-style:none;margin:0;padding:0;display:flex;gap:4px;overflow-x:auto;white-space:nowrap}
+.pnav a{display:block;padding:12px 10px;text-decoration:none;font-size:14.5px;font-weight:600;color:var(--slag-2)}
+.pnav a:hover{color:var(--slag)}
+body{margin:0;background:var(--ash);color:var(--slag);font:400 15.5px/1.5 "Archivo",system-ui,sans-serif}
 a{color:inherit}button:focus-visible,a:focus-visible{outline:3px solid var(--active);outline-offset:2px}
 .wrap{max-width:1240px;margin:0 auto;padding:0 24px}
 header{padding:36px 0 8px;display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap}
@@ -210,28 +216,29 @@ td.num{font-weight:700;width:40px}td.st{color:var(--slag-2);font-size:13px}
 ul.dec{margin:0;padding-left:18px;font-size:14px}ul.dec li{margin-bottom:8px}
 .caveat{font-size:13px;color:var(--slag-2);max-width:80ch}
 footer{margin:48px 0 40px;font-size:13px;color:var(--slag-2)}
-</style></head><body><div class="wrap">
+</style></head><body><div class="wrap"><main id="main-content">
 <header><div><h1>Engine development</h1><p class="caveat">Snapshot of the Kindling task queue in git. Claude Code's own status edits stay uncommitted on the PC, so rows it is working on can lag here.</p></div>
-<div class="meta">Built %BUILT%<br>Queue commit %COMMIT%<br><a href="index.html">Home</a> · <a href="engine.html">Engine overview</a></div></header>
+<div class="meta">Built %BUILT%<br>Queue commit %COMMIT%</div></header>
 
+<nav class="pnav" aria-label="On this page"><ul><li><a href="#experiments">Experiments</a></li><li><a href="#needs">Needs Steven</a></li><li><a href="#build">Build order</a></li><li><a href="#standards">Standards</a></li><li><a href="#alltasks">All tasks</a></li><li><a href="#decisions">Decisions</a></li></ul></nav>
 <div class="kpis"><div class="a"><b>%ACTIVE%</b><span>In progress</span></div><div><b>%READY%</b><span>Ready to start</span></div><div class="s"><b>%STEVEN%</b><span>Need Steven</span></div><div class="d"><b>%DONE%</b><span>Done (of %TOTAL% tasks)</span></div></div>
 <div class="bar" aria-hidden="true">%BAR%</div>
 
-<section><h2>AAA PBR experiments</h2><div class="exps">%EXP%</div></section>
+<section id="experiments"><h2>AAA PBR experiments</h2><div class="exps">%EXP%</div></section>
 
 <div class="grid">
-<section style="margin-top:0"><h2>Needs Steven</h2><ul class="needs">%NEEDS%</ul></section>
-<section style="margin-top:0"><h2>Engine build order</h2><ol class="steps">%STEPS%</ol></section>
+<section style="margin-top:0" id="needs"><h2>Needs Steven</h2><ul class="needs">%NEEDS%</ul></section>
+<section style="margin-top:0" id="build"><h2>Engine build order</h2><ol class="steps">%STEPS%</ol></section>
 </div>
 
-<section><h2>Standards</h2><div class="tablewrap"><table><thead><tr><th>#</th><th>Standard</th><th>Owner</th><th>State</th></tr></thead><tbody>%STD%</tbody></table></div></section>
+<section id="standards"><h2>Standards</h2><div class="tablewrap"><table><thead><tr><th>#</th><th>Standard</th><th>Owner</th><th>State</th></tr></thead><tbody>%STD%</tbody></table></div></section>
 
-<section><h2>All tasks</h2><div class="chips" role="group" aria-label="Filter by status">%LEGEND%</div>
+<section id="alltasks"><h2>All tasks</h2><div class="chips" role="group" aria-label="Filter by status">%LEGEND%</div>
 <div class="tablewrap" style="margin-top:12px"><table id="tasks"><thead><tr><th>#</th><th>Task</th><th>State</th><th>Status line</th></tr></thead><tbody>%ROWS%</tbody></table></div></section>
 
-<section><h2>Latest decisions</h2><ul class="dec">%DEC%</ul></section>
+<section id="decisions"><h2>Latest decisions</h2><ul class="dec">%DEC%</ul></section>
 <footer>Built by tools/build_dev_dashboard.py in KindlingDashboard from KindlingEngine handover/queue/kindling-task-queue.md and reports/.</footer>
-</div>
+</main></div>
 <script>
 const chips=[...document.querySelectorAll('.chip')];const rows=[...document.querySelectorAll('#tasks tbody tr')];
 chips.forEach(c=>c.addEventListener('click',()=>{const on=c.getAttribute('aria-pressed')!=='true';chips.forEach(x=>x.setAttribute('aria-pressed','false'));c.setAttribute('aria-pressed',on?'true':'false');rows.forEach(r=>r.hidden=on&&r.dataset.k!==c.dataset.k);}));

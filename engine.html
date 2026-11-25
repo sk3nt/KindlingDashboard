@@ -121,7 +121,7 @@ footer{background:var(--slag);color:#C9D0CC;padding:36px 0;font-size:14.5px}
 footer a{color:#fff}
 
 .shell{display:grid;grid-template-columns:270px minmax(0,1fr)}
-.side{position:sticky;top:0;height:100vh;overflow-y:auto;background:var(--slag);color:#D7DDD9;padding:22px 18px 40px;font-size:14.5px}
+.side{position:sticky;top:var(--sitenav-h,0px);height:calc(100vh - var(--sitenav-h,0px));overflow-y:auto;background:var(--slag);color:#D7DDD9;padding:22px 18px 40px;font-size:14.5px}
 .side summary{list-style:none;font-variation-settings:"wdth" 125;font-weight:800;font-size:24px;color:#fff;cursor:pointer;margin-bottom:6px}
 .side summary::-webkit-details-marker{display:none}
 .side .sh{margin:20px 0 6px;color:#8E9AA2;font-size:13px;font-weight:600}
@@ -151,19 +151,20 @@ ol.exps{list-style:none;padding:0;margin:24px 0 0;display:grid;grid-template-col
 .xp .o{color:var(--slag-2)}
 .row{scroll-margin-top:12px}
 :target{outline:3px solid var(--ember);outline-offset:4px}
+[id]{scroll-margin-top:calc(var(--sitenav-h,0px) + 16px)}
 </style>
+<script src="shared/sitenav.js" defer></script>
 </head>
 <body>
 <div class="shell">
 
-<aside class="side" aria-label="Site navigation"><details open><summary>Kindling</summary>
-<p class="sh">Pages</p><ul><li><a href="index.html">Home</a></li><li><a href="dev-dashboard.html">Engine development</a></li><li><a href="discovery/index.html">Kindling Discovery</a></li></ul>
+<aside class="side" aria-label="Site navigation"><details open><summary>Engine</summary>
 <p class="sh">This page</p><ul><li><a href="#how">How it works</a></li><li><a href="#areas">Game dev areas</a></li><li><a href="#experiments">AAA experiments</a></li><li><a href="#ledger">What we tried</a></li><li><a href="#previs">Previs</a></li><li><a href="#look">How the look moved</a></li><li><a href="#team">Team</a></li><li><a href="#lessons">What we learned</a></li></ul>
 <p class="sh">Game dev areas</p><ul><li><a href="#a-look">Concept and look development</a></li><li><a href="#a-characters">Characters</a></li><li><a href="#a-rig">Rigging and faces</a></li><li><a href="#a-anim">Animation</a></li><li><a href="#a-env">Environment art</a></li><li><a href="#a-world">Level and world</a></li><li><a href="#a-light">Lighting and look layer</a></li><li><a href="#a-design">Game design</a></li><li><a href="#a-narrative">Narrative</a></li><li><a href="#a-previs">Previs and trailer</a></li><li><a href="#a-techart">Technical art and performance</a></li><li><a href="#a-audio">Audio</a></li><li><a href="#a-engine">Engine and pipeline</a></li></ul>
 <p class="sh">AAA experiments</p><ul><li><a href="#e1"><i class="dot i" aria-hidden="true"></i><b>E1</b> Turnaround, head and hand sheets<span class="sr">, In progress</span></a></li><li><a href="#e2"><i class="dot w" aria-hidden="true"></i><b>E2</b> Mesh bake-off on the sheets<span class="sr">, Waiting</span></a></li><li><a href="#e3"><i class="dot r" aria-hidden="true"></i><b>E3</b> Rig standard v2 and head landmarks<span class="sr">, Ready</span></a></li><li><a href="#e4"><i class="dot r" aria-hidden="true"></i><b>E4</b> Prop sheet standard and 5 props<span class="sr">, Ready</span></a></li><li><a href="#e5"><i class="dot w" aria-hidden="true"></i><b>E5</b> PBR materials, the hero at 3 tiers<span class="sr">, Waiting</span></a></li><li><a href="#e6"><i class="dot w" aria-hidden="true"></i><b>E6</b> Face shapes and a video-driven clip<span class="sr">, Waiting</span></a></li><li><a href="#e7"><i class="dot r" aria-hidden="true"></i><b>E7</b> One streamed 1 km tile<span class="sr">, Ready</span></a></li><li><a href="#e8"><i class="dot w" aria-hidden="true"></i><b>E8</b> Mobile proof<span class="sr">, Waiting</span></a></li></ul>
 <p class="sh">Earlier experiments</p><ul><li><a href="#x-characters"><i class="dot p" aria-hidden="true"></i>Character pipeline<span class="sr">, Proven</span></a></li><li><a href="#x-previs"><i class="dot g" aria-hidden="true"></i>Previs pipeline<span class="sr">, Promising</span></a></li><li><a href="#x-mesh"><i class="dot i" aria-hidden="true"></i>Mesh and rig from plates<span class="sr">, In progress</span></a></li><li><a href="#x-prompted-anim"><i class="dot i" aria-hidden="true"></i>Prompted animation<span class="sr">, In progress</span></a></li><li><a href="#x-hand-anim"><i class="dot d" aria-hidden="true"></i>Hand-keyed animation<span class="sr">, Dead end</span></a></li><li><a href="#x-looks"><i class="dot d" aria-hidden="true"></i>Stylised looks<span class="sr">, Dead end</span></a></li><li><a href="#x-mayor"><i class="dot d" aria-hidden="true"></i>Mayor restyle<span class="sr">, Dead end</span></a></li><li><a href="#x-guardrails"><i class="dot d" aria-hidden="true"></i>Guardrail wording<span class="sr">, Dead end</span></a></li><li><a href="#x-dialogue"><i class="dot k" aria-hidden="true"></i>Live AI dialogue<span class="sr">, Parked</span></a></li><li><a href="#x-local-gen"><i class="dot k" aria-hidden="true"></i>Local image generation<span class="sr">, Parked</span></a></li></ul>
 </details></aside>
-<div class="content">
+<div class="content" id="main-content">
 
 <header class="hero"><div class="wrap">
   <h1>Kindling</h1>
@@ -367,7 +368,7 @@ ol.exps{list-style:none;padding:0;margin:24px 0 0;display:grid;grid-template-col
 </main>
 
 <footer><div class="wrap">
-  Kindling engine. Last updated 25 November 2026. The game it builds: <a href="discovery/index.html">Kindling Discovery</a>.
+  Kindling engine. Last updated 25 November 2026. The game it builds: <a data-space="discovery">Kindling Discovery</a>.
 </div></footer>
 </div>
 </div>

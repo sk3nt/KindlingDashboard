@@ -30,7 +30,7 @@ p{max-width:var(--measure);margin:0 0 16px}
 .note{font-size:16px;color:var(--plaster-2)}
 .ora{color:var(--ora)}
 
-nav.top{position:fixed;top:0;left:0;right:0;z-index:5;background:color-mix(in srgb,var(--night) 86%,transparent);backdrop-filter:blur(8px)}
+nav.top{position:fixed;top:var(--sitenav-h,0px);left:0;right:0;z-index:5;background:color-mix(in srgb,var(--night) 86%,transparent);backdrop-filter:blur(8px)}
 nav.top .wrap{display:flex;gap:22px;align-items:center;height:56px;overflow-x:auto;white-space:nowrap;font-family:"Bricolage Grotesque",sans-serif;font-size:16px}
 nav.top b{margin-right:auto;font-weight:800;font-size:18px}
 nav.top a{color:var(--plaster);text-decoration:none}
@@ -45,7 +45,7 @@ header.hero h1{font-size:clamp(64px,12vw,170px);font-weight:800;line-height:.86;
 header.hero h1 span{display:block;color:var(--mustard)}
 header.hero p{margin-top:26px;font-size:24px;max-width:36ch;line-height:1.45}
 
-section{padding:110px 0 0}
+section{padding:110px 0 0;scroll-margin-top:calc(var(--sitenav-h,0px) + 40px)}
 main > section:last-child{padding-bottom:110px}
 
 /* world */
@@ -125,18 +125,18 @@ ol.beats p{font-size:17.5px;margin:0}
 
 footer{border-top:1px solid rgba(241,228,214,.16);padding:34px 0 48px;font-size:16px;color:var(--plaster-2)}
 </style>
+<script src="../shared/sitenav.js" defer></script>
 </head>
 <body>
 
 <nav class="top" aria-label="Sections"><div class="wrap">
-  <b>Kindling Discovery</b>
+  <b>Game bible</b>
   <a href="#world">World</a>
   <a href="#episode">Episode 01</a>
   <a href="#characters">Characters</a>
   <a href="#places">Places</a>
   <a href="#assets">Assets</a>
   <a href="#team">Team</a>
-  <a href="../index.html">Home</a>
 </div></nav>
 
 <header class="hero">
@@ -313,7 +313,7 @@ footer{border-top:1px solid rgba(241,228,214,.16);padding:34px 0 48px;font-size:
 
 <section id="team"><div class="wrap">
   <h2>Who builds it</h2>
-  <p class="lede">Steven is the creative director. A team of named AI agents builds the game on the <a href="../engine.html">Kindling engine</a>, and the same team builds the engine.</p>
+  <p class="lede">Steven is the creative director. A team of named AI agents builds the game on the <a data-space="engine">Kindling engine</a>, and the same team builds the engine.</p>
   <div class="crew">
     <div><b>Quill</b><span>Narrative</span><p>Lore, dialogue, and how story reaches the player. Keeps this bible.</p></div>
     <div><b>Lumen</b><span>Look development</span><p>Concept direction, the look layer, briefs and generator prompts.</p></div>
@@ -347,6 +347,6 @@ footer{border-top:1px solid rgba(241,228,214,.16);padding:34px 0 48px;font-size:
 </div></section>
 </main>
 
-<footer><div class="wrap">Kindling Discovery game bible. Last updated 25 November 2026. Built with the <a href="../engine.html">Kindling engine</a>.</div></footer>
+<footer><div class="wrap">Kindling Discovery game bible. Last updated 25 November 2026. Built with the <a data-space="engine">Kindling engine</a>.</div></footer>
 </body>
 </html>
