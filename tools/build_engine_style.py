@@ -1,0 +1,85 @@
+#!/usr/bin/env python3
+r"""Builds the "Look development: style guide" section of engine.html between
+<!--style:start--> and <!--style:end--> (placed before the characters section).
+Palette values were measured from the village square film frame (median of a 10 px patch per swatch).
+Draft: Steven approves; the repo style guide (docs/style-guide.md, gated) is not changed by this."""
+import html, re
+from pathlib import Path
+ROOT = Path(__file__).resolve().parent.parent
+E = html.escape
+
+GROUPS = [
+    ("Base: sky, stone and ground", "Most of every frame. Warm, muted, never pure white or black.", [
+        ("Dawn sky", "#E6C3D1"), ("Sun haze", "#FDD2D0"), ("Honey stone, lit", "#B2816B"), ("Honey stone, mid", "#986953"),
+        ("Terracotta", "#74402A"), ("Cobble", "#6C5956")]),
+    ("Greens: paint and plants", "Deep, desaturated greens. Teal paint belongs to the square only (props list, L3).", [
+        ("Shutter teal", "#254144"), ("Door green", "#3D402E"), ("Clipped shrub", "#2F2E16")]),
+    ("Accents: textiles and flowers", "Small, saturated, and few. In the square they cover about 8 percent of the frame.", [
+        ("Cloth teal", "#0F4B52"), ("Cloth orange", "#AF571A"), ("Cloth magenta", "#8E1449"), ("Cloth mustard", "#BE8610"),
+        ("Cloth blue", "#204E77"), ("Banner red", "#9A2329"), ("Bougainvillea", "#541C2D"), ("Paper lantern", "#B88E67")]),
+    ("Ora: the one magic colour", "Only for Ora light: Tomas's lantern, Tally's core and LED, the Mayor's gem. Measured from the canon lantern plate.", [
+        ("Ora green", "#7EE41E")]),
+]
+RULES = [
+    ("Render", "Fully photoreal, with a stylised post-process on top (decided 2026-11-25). The palette here is the target after the post-process."),
+    ("Light", "Dawn: a low warm sun behind the scene, pink and peach sky, thin haze, soft shadows. Ordinary fire and window light are amber."),
+    ("Proportion", "Warm stone and sky carry the frame. Saturated accents stay small, about a tenth of the frame at most, and cluster where the eye should go."),
+    ("Ora green", "Green light means Ora and nothing else. No green lamps, no green sky, no green glow on distant walls."),
+    ("Per location", "Each location keeps its own accent colour pair and signature props (props list). The same textile hue is never the main accent in two neighbouring locations."),
+    ("Materials", "Honey limestone, lime plaster, terracotta roofs and pots, weathered timber, worn stone steps and cobbles. Clean and lived-in, never grimy."),
+    ("Characters", "Costumes read against the stone: Tomas in teal stripes, Ines in cream, the Mayor in red, orange and gold patchwork, Tally in olive and orange."),
+]
+DONT = ["Neon or fully saturated colour over large areas", "Grey, cold or blue-hour light", "Green used for anything that is not Ora",
+        "Repeated banner sets across locations", "Text, signs or logos in the world"]
+
+
+def sw(name, hx):
+    return (f'<li class="sw"><span class="chip" style="background:{hx}"></span><b>{E(name)}</b><code>{hx}</code></li>')
+
+
+groups = "".join(f'<div class="swg"><h4>{E(t)}</h4><p class="o">{E(d)}</p><ul class="sws">{"".join(sw(*s) for s in ss)}</ul></div>' for t, d, ss in GROUPS)
+rules = "".join(f"<li><b>{E(a)}.</b> {E(b)}</li>" for a, b in RULES)
+donts = "".join(f"<li>{E(x)}</li>" for x in DONT)
+
+SECTION = f'''<!--style:start-->
+<section id="style"><div class="wrap">
+  <h2>Look development: style guide</h2>
+  <p class="lede">The look in one place: palette, light and rules for every character, location and prop. The palette is measured from the village square film frame. This is a draft for Steven; the repo style guide changes only when he accepts it.</p>
+  <div class="stylehero"><a class="im" href="img/environment/v1-full.webp" target="_blank" rel="noopener" title="Open full size in a new window"><img src="img/environment/v1.webp" alt="The village square at dawn, the palette source" loading="lazy"></a>
+  <p class="o">Palette source: the empty village square plate. Click to open full size.</p></div>
+  {groups}
+  <h3 class="ch3">Rules</h3><ul class="srules">{rules}</ul>
+  <h3 class="ch3">Never</h3><ul class="srules">{donts}</ul>
+  <div class="todo"><h3 class="ch3">Next to do</h3><ol class="nexts">
+    <li><b>Steven approves or changes the palette and rules.</b></li>
+    <li><b>Write it into the repo style guide</b> (a gated file: Steven accepts the change, and earlier gate results are re-run).</li>
+    <li><b>Lena builds the post-process grade</b> that turns the photoreal render into this palette, tested on one Unity scene per quality tier.</li>
+    <li><b>Astrid adds a palette check</b> to her look gate: accent share and Ora-green misuse, measured on each new frame.</li>
+  </ol></div>
+</div></section>
+<!--style:end-->'''
+
+CSS = '''/*style:start*/
+.stylehero{max-width:900px;margin-top:16px}.stylehero .im{height:auto;max-height:420px}
+.swg{margin-top:26px}.swg h4{font-size:17px;margin:0 0 2px}
+ul.sws{list-style:none;margin:10px 0 0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.sw{background:#EEF0EE;padding:8px}.sw .chip{display:block;height:64px;border:1px solid rgba(0,0,0,.15);margin-bottom:6px}
+.sw b{display:block;font-size:14px}.sw code{font-size:12.5px;color:var(--slag-2)}
+ul.srules{margin:8px 0 0;padding-left:20px;max-width:900px}ul.srules li{margin:0 0 6px;font-size:15px}
+/*style:end*/'''
+
+p = ROOT / "engine.html"
+s = p.read_text(encoding="utf-8")
+if "<!--style:start-->" in s:
+    s = re.sub(r"<!--style:start-->.*?<!--style:end-->", lambda m: SECTION, s, flags=re.S)
+else:
+    s = s.replace("<!--characters:start-->", SECTION + "\n<!--characters:start-->", 1)
+if "/*style:start*/" in s:
+    s = re.sub(r"/\*style:start\*/.*?/\*style:end\*/", lambda m: CSS, s, flags=re.S)
+else:
+    s = s.replace("/*characters:start*/", CSS + "\n/*characters:start*/", 1)
+if 'href="#style"' not in s:
+    s = s.replace('<li><a href="#characters">Characters</a></li>', '<li><a href="#style">Style guide</a></li><li><a href="#characters">Characters</a></li>', 1)
+    s = s.replace('<dt>See</dt><dd><a href="#characters">', '<dt>See</dt><dd><a href="#style">Style guide</a>; <a href="#characters">', 1)
+p.write_text(s, encoding="utf-8")
+print("style section written")
