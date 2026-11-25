@@ -29,13 +29,16 @@ RULES = [
     ("Materials", "Honey limestone, lime plaster, terracotta roofs and pots, weathered timber, worn stone steps and cobbles. Clean and lived-in, never grimy."),
     ("Characters", "Costumes read against the stone: Tomas in teal stripes, Ines in cream, the Mayor in red, orange and gold patchwork, Tally in olive and orange."),
 ]
-LOOKS = [
-    ("base", "Base: the film frame as generated", "Plain photoreal. Beautiful, but it could be any film or game set in a Mediterranean village.", ""),
-    ("a", "A. Golden memory", "Highlights glow and bleed red at the edges like film halation, blacks lift slightly, warm highlights, fine grain. The world feels remembered, like a summer you once had.", "Recommended base. Cheap in Unity (bloom, a halation pass, a colour grade, grain); scales to mobile by dropping the halation."),
-    ("b", "B. Fresco", "Matte, chalky, lower contrast and saturation, like faded wall painting. Calm and distinctive.", "Risk: reads washed out on bright screens, and the player and ledges lose contrast."),
-    ("c", "C. Selective colour", "The world is pulled towards stone and dust; only textiles, flowers and Ora keep full colour. Colour becomes the story: as the village thrives, colour returns.", "Recommended as the story layer on top of A: the struggling-to-thriving look keys use it."),
-    ("d", "D. Painted distance", "Near things photoreal, far things simplified like a painting. Bridges the painterly key art and the photoreal canon.", "Strongest identity, hardest to build: a distance-based painterly filter per tier. This crude mock-up also outlines edges, which a real build would avoid."),
-]
+import os, sys
+GAME = Path(sys.argv[1] if len(sys.argv) > 1 else os.environ.get("KINDLING_GAME", ROOT.parent / "KindlingDiscovery"))
+LTXT = (GAME / "Production" / "Design" / "prompts" / "look-direction-prompts.md").read_text(encoding="utf-8")
+LCOMMON = re.search(r"^COMMON: (.*)$", LTXT, re.M).group(1)
+LOOKS = [(m.group(1), m.group(2), m.group(3)) for m in re.finditer(r"^([A-D]): ([^.]+)\. (.*)$", LTXT, re.M)]
+_s1 = re.search(r"^S1 \(([^)]*)\): (.*)$", LTXT, re.M)
+if _s1:
+    LOOKS.append(("S1", "Ora optics test", _s1.group(2) + " (" + _s1.group(1).split(";", 1)[-1].strip() + ")"))
+LNOTE = {"A": "Recommended base: cheap in Unity (bloom, halation, grade, grain).", "C": "Recommended story layer on top of A: the struggling and thriving village.",
+         "B": "Risk: washed out on bright screens; ledges lose contrast.", "D": "Strongest identity, hardest to build.", "S1": "Tests the Ora signature, not a grade."}
 SIGNATURE = [
     ("First light", "The world lives mostly in dawn and the golden hour, because Tomas carries the first light. Midday and night are rare and meaningful."),
     ("Ora has its own optics", "Ora green is the only saturated light, with its own halo, flicker and green caustics on nearby stone; nothing else glows like it."),
@@ -69,7 +72,7 @@ MISSING = [
     ("Reference boards", "Approved and rejected images for each rule, side by side."),
     ("UI and type", "Later, once there is a game to put it on."),
 ]
-DONT = ["Neon or fully saturated colour over large areas", "Grey, cold or blue-hour light", "Green used for anything that is not Ora",
+DONT = ["Stock game props: barrels, crates, sacks, chests (Steven, 2026-11-25)", "Neon or fully saturated colour over large areas", "Grey, cold or blue-hour light", "Green used for anything that is not Ora",
         "Repeated banner sets across locations", "Text, signs or logos in the world"]
 
 
@@ -81,8 +84,9 @@ groups = "".join(f'<div class="swg"><h4>{E(t)}</h4><p class="o">{E(d)}</p><ul cl
 rules = "".join(f"<li><b>{E(a)}.</b> {E(b)}</li>" for a, b in RULES)
 signature = "".join(f"<li><b>{E(a)}.</b> {E(b)}</li>" for a, b in SIGNATURE)
 looks = "".join(
-    f'<li class="cc"><div class="cl">{E(t)}</div><a class="im" href="img/style/look-{k}-full.webp" target="_blank" rel="noopener" title="Open full size in a new window"><img src="img/style/look-{k}.webp" alt="{E(t)}" loading="lazy"></a><p class="np" style="color:var(--slag)">{E(d)}</p>'
-    + (f'<p class="np">{E(n)}</p>' if n else "") + "</li>" for k, t, d, n in LOOKS)
+    f'<li class="cc"><div class="cl">{E(k)}. {E(t)}</div><div class="im gen" role="img" aria-label="Not generated yet"><span>Generate</span></div>'
+    f'<p class="np">{E(LNOTE.get(k, ""))}</p><details class="pr"><summary><span class="snip">{E(d[:130])}…</span><span class="more">Full prompt</span></summary><pre>{E("COMMON: " + LCOMMON + chr(10) + chr(10) + k + ": " + t + ". " + d)}</pre></details></li>'
+    for k, t, d in LOOKS)
 keys = "".join(f"<tr><td><b>{E(a)}</b></td><td>{E(b)}</td><td>{E(c)}</td></tr>" for a, b, c in KEYS)
 consts = "".join(f"<li>{E(x)}</li>" for x in CONST)
 missing = "".join(f"<li><b>{E(a)}.</b> {E(b)}</li>" for a, b in MISSING)
@@ -95,8 +99,8 @@ SECTION = f'''<!--style:start-->
   <h3 class="ch3">What makes the photoreal look ours</h3>
   <p class="o">Photoreal alone is not a look, so these five signatures carry the identity, whatever the grade.</p>
   <ul class="srules">{signature}</ul>
-  <h3 class="ch3">Grade directions: pick one</h3>
-  <p class="o">Quick local grades of the same film frame, to compare directions; not final. Click to open full size. My recommendation: A as the base grade, with C as the story layer.</p>
+  <h3 class="ch3">Grade directions: generate, then pick one</h3>
+  <p class="o">Each direction is an image-generator edit of the same village square plate, so they compare like for like. Prompts in the game repo, <code>Production/Design/prompts/look-direction-prompts.md</code>. My recommendation: A as the base grade, with C as the story layer.</p>
   <ol class="cstrip lookdirs">{looks}</ol>
   <h3 class="ch3">Palette</h3>
   <div class="stylehero"><a class="im" href="img/environment/v1-full.webp" target="_blank" rel="noopener" title="Open full size in a new window"><img src="img/environment/v1.webp" alt="The village square at dawn, the palette source" loading="lazy"></a>
@@ -110,7 +114,7 @@ SECTION = f'''<!--style:start-->
   <p class="o" style="margin-top:12px"><b>Stays the same in every key:</b></p><ul class="srules">{consts}</ul>
   <h3 class="ch3">Still to write</h3><ul class="srules">{missing}</ul>
   <div class="todo"><h3 class="ch3">Next to do</h3><ol class="nexts">
-    <li><b>Steven picks a grade direction</b> (A to D, or a mix).</li>
+    <li><b>Steven generates directions A to D and S1</b> on the village square plate, then picks one (or a mix).</li>
     <li><b>Steven approves or changes the palette and rules.</b></li>
     <li><b>Astrid writes the first look keys:</b> night and the castle first (most different from the base), then the struggling and thriving village.</li>
     <li><b>Write it into the repo style guide</b> (a gated file: Steven accepts the change, and earlier gate results are re-run).</li>

@@ -94,14 +94,14 @@ SECTION = f'''<!--environment:start-->
   <div class="crow"><h3>Village: key locations</h3><ol class="cstrip envgrid">{group(r"V\d")}</ol></div>
   <div class="crow"><h3>Castle: key locations</h3><ol class="cstrip envgrid">{group(r"C\d")}</ol></div>
   <div class="crow"><h3>Isolated key structures</h3><p class="o">Grid modules (house walls, stairs, roofs, terraces) become procedural kits later; their sheets are the look reference. Landmarks can be meshed from the sheet.</p><ol class="cstrip envgrid">{group(r"S-")}</ol></div>
-  <div class="crow"><h3>Props</h3><p class="o">P1 to P5 are the E4 village kit. The rest are signature props from the props list.</p><ol class="cstrip envgrid">{group(r"P\d")}</ol></div>
+  <div class="crow"><h3>Props</h3><p class="o">Props marked E4 are the first five to build. No stock game props: no barrels, crates, sacks or chests.</p><ol class="cstrip envgrid">{group(r"P\d")}</ol></div>
   <div class="todo"><h3 class="ch3">Next to do</h3><ol class="nexts">
     <li><b>Clean plates</b> for the frames that have a character in them: V2, V3, C1, C2, C3 (same camera, character removed).</li>
     <li><b>V0, the village establishing shot,</b> from the layout of record, with the square plate attached for the look.</li>
     <li><b>Village plates V4 to V7,</b> then castle plates C0, C4 and C5.</li>
     <li><b>Structure sheets,</b> landmarks first: S-V4 market stall, the bridge (S-V5 or S-V10), S-C1 gatehouse, S-C4 keep, S-C6 gate tunnel.</li>
     <li><b>Steven decides</b> whether the timber footbridge becomes a fortified stone bridge with a gate tower (S-V10).</li>
-    <li><b>Prop sheets P1 to P5</b> for E4, then the signature props.</li>
+    <li><b>Prop sheets for the five E4 props</b> (P3, P4, P5, P8, P12), then the rest.</li>
     <li><b>Steven approves</b> the 9 locations and caps in the props list (still a draft).</li>
   </ol></div>
 </div></section>
