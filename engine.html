@@ -1,0 +1,375 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kindling: the AI game-dev workflow engine</title>
+<meta name="description" content="How Kindling works, what we tried, what worked and what was a dead end.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ash:#E3E6E3; --ash-2:#D5D9D5; --slag:#22292E; --slag-2:#4A545B;
+  --proven:#2A8F55; --promising:#C98A12; --dead:#9A3A2E; --parked:#76818A;
+  --ember:#D9622B;
+  --measure:68ch;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
+body{margin:0;background:var(--ash);color:var(--slag);font:400 17px/1.6 "Archivo",system-ui,sans-serif;font-variation-settings:"wdth" 100}
+a{color:inherit;text-decoration-thickness:1px;text-underline-offset:3px}
+a:focus-visible,button:focus-visible{outline:3px solid var(--ember);outline-offset:3px}
+img{display:block;max-width:100%;height:auto}
+.wrap{max-width:1180px;margin:0 auto;padding:0 28px}
+h1,h2,h3{font-variation-settings:"wdth" 125;line-height:1.05;margin:0;letter-spacing:-.01em}
+h1{font-size:clamp(56px,10vw,132px);font-weight:800}
+h2{font-size:clamp(32px,4.4vw,52px);font-weight:750;margin-bottom:18px}
+h3{font-size:21px;font-weight:700;font-variation-settings:"wdth" 110}
+p{max-width:var(--measure);margin:0 0 14px}
+.lede{font-size:21px;line-height:1.5;max-width:56ch}
+.small{font-size:14.5px;color:var(--slag-2)}
+
+/* nav */
+nav.top{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--ash) 92%,transparent);backdrop-filter:blur(6px);border-bottom:1px solid var(--ash-2)}
+nav.top .wrap{display:flex;gap:22px;align-items:center;height:54px;overflow-x:auto;white-space:nowrap}
+nav.top b{font-variation-settings:"wdth" 125;font-weight:800;margin-right:auto}
+nav.top a{text-decoration:none;font-size:15px}
+nav.top a:hover{text-decoration:underline}
+
+/* hero */
+header.hero{padding:64px 0 0}
+header.hero .lede{margin-top:20px}
+.strip{margin:44px 0 0;background:var(--slag);padding:14px 14px 0}
+.strip figcaption{color:#C9D0CC;font-size:14.5px;padding:12px 2px 14px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.strip figcaption strong{color:#fff;font-weight:600}
+
+section{padding:88px 0 0}
+section:last-of-type{padding-bottom:96px}
+
+/* flow diagram */
+.flow{display:grid;grid-template-columns:repeat(5,1fr);gap:0;margin:30px 0 8px;border:2px solid var(--slag)}
+.flow div{padding:16px 16px 18px;border-right:2px solid var(--slag);position:relative;background:#EEF0EE}
+.flow div:last-child{border-right:0}
+.flow div::after{content:"";position:absolute;right:-9px;top:50%;width:14px;height:14px;background:var(--ash);border-top:2px solid var(--slag);border-right:2px solid var(--slag);transform:translateY(-50%) rotate(45deg);z-index:1}
+.flow div:last-child::after{display:none}
+.flow b{display:block;font-variation-settings:"wdth" 115;font-size:16px;margin-bottom:4px}
+.flow span{font-size:14px;color:var(--slag-2);display:block;line-height:1.4}
+@media (max-width:820px){.flow{grid-template-columns:1fr}.flow div{border-right:0;border-bottom:2px solid var(--slag)}.flow div::after{display:none}.flow div:last-child{border-bottom:0}}
+
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:28px 36px;margin-top:28px}
+.cols h3{margin-bottom:8px}
+.cols ul{margin:0;padding-left:18px}
+.cols li{margin-bottom:6px;font-size:15.5px}
+
+/* steps */
+ol.steps{list-style:none;padding:0;margin:26px 0 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:2px;background:var(--slag);border:2px solid var(--slag)}
+ol.steps li{background:#EEF0EE;padding:14px 16px 16px;counter-increment:s;font-size:15px;line-height:1.4}
+ol.steps li::before{content:counter(s);display:block;font-variation-settings:"wdth" 125;font-weight:800;font-size:30px;line-height:1;margin-bottom:8px}
+ol.steps li.on::before{color:var(--proven)}
+ol.steps li.go::before{color:var(--promising)}
+ol.steps{counter-reset:s}
+
+/* ledger */
+.legend{display:flex;gap:20px;flex-wrap:wrap;margin:18px 0 6px;font-size:15px}
+.legend i{display:inline-block;width:12px;height:12px;margin-right:7px;vertical-align:-1px}
+.ledger{margin-top:20px;border-top:2px solid var(--slag)}
+.row{display:grid;grid-template-columns:150px 1fr 1.25fr;gap:24px;padding:20px 0 20px 16px;border-bottom:1px solid #BFC5C1;border-left:6px solid var(--k)}
+.row .st{font-variation-settings:"wdth" 115;font-weight:700;color:var(--k);font-size:15px}
+.row h3{font-size:19px;margin-bottom:6px}
+.row p{font-size:15.5px;margin:0}
+.row .ev{font-size:14.5px;color:var(--slag-2)}
+.p{--k:var(--proven)} .g{--k:var(--promising)} .d{--k:var(--dead)} .k{--k:var(--parked)}
+@media (max-width:820px){.row{grid-template-columns:1fr;gap:6px}}
+
+/* previs */
+.chain{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:22px}
+.chain figure{margin:0}
+.chain figcaption{font-size:14px;margin-top:6px;color:var(--slag-2)}
+.chain figcaption b{color:var(--slag)}
+.guides{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:22px;align-items:start}
+.guides figure{margin:0}
+@media (max-width:820px){.chain,.guides{grid-template-columns:1fr 1fr}}
+
+/* look journey */
+.journey{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-top:24px}
+.journey figure{margin:0}
+.journey img{aspect-ratio:3/4;object-fit:cover;width:100%;background:var(--ash-2)}
+.journey .noimg{aspect-ratio:3/4;display:flex;align-items:center;justify-content:center;background:var(--ash-2);font-size:14px;padding:12px;text-align:center;color:var(--slag-2)}
+.journey figcaption{font-size:14px;margin-top:8px;line-height:1.4}
+.journey figcaption b{display:block;font-size:15px}
+.journey .x b{color:var(--dead)} .journey .v b{color:var(--proven)}
+@media (max-width:820px){.journey{grid-template-columns:1fr 1fr}}
+
+/* team */
+.team{display:grid;grid-template-columns:1fr 1fr;gap:48px;margin-top:20px}
+.team h3{padding-bottom:8px;border-bottom:2px solid var(--slag);margin-bottom:6px}
+.team dl{margin:0}
+.team .m{display:grid;grid-template-columns:96px 1fr;gap:12px;padding:10px 0;border-bottom:1px solid #C6CBC7}
+.team dt{font-variation-settings:"wdth" 125;font-weight:800;font-size:18px}
+.team dd{margin:0;font-size:15px;line-height:1.45}
+.team dd em{font-style:normal;color:var(--slag-2);display:block;font-size:14px}
+.team .later dt{color:var(--parked)}
+@media (max-width:820px){.team{grid-template-columns:1fr}}
+
+.lessons{columns:2 320px;column-gap:44px;margin-top:20px;padding:0;list-style:none}
+.lessons li{break-inside:avoid;margin:0 0 18px;font-size:15.5px}
+.lessons b{display:block;font-variation-settings:"wdth" 112}
+
+footer{background:var(--slag);color:#C9D0CC;padding:36px 0;font-size:14.5px}
+footer a{color:#fff}
+
+.shell{display:grid;grid-template-columns:270px minmax(0,1fr)}
+.side{position:sticky;top:0;height:100vh;overflow-y:auto;background:var(--slag);color:#D7DDD9;padding:22px 18px 40px;font-size:14.5px}
+.side summary{list-style:none;font-variation-settings:"wdth" 125;font-weight:800;font-size:24px;color:#fff;cursor:pointer;margin-bottom:6px}
+.side summary::-webkit-details-marker{display:none}
+.side .sh{margin:20px 0 6px;color:#8E9AA2;font-size:13px;font-weight:600}
+.side ul{list-style:none;margin:0;padding:0}
+.side li a{display:block;padding:4px 6px;margin:0 -6px;color:#E4E9E6;text-decoration:none;line-height:1.3}
+.side li a:hover{background:#333C42}
+.side li a:focus-visible{outline:2px solid var(--ember);outline-offset:0}
+.side b{font-variation-settings:"wdth" 110;color:#fff;margin-right:4px}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:8px;vertical-align:1px;background:var(--parked)}
+.dot.p{background:#3FB46E}.dot.g{background:#E0A526}.dot.d{background:#D0614F}.dot.k{background:#8E9AA2}.dot.i{background:var(--ember)}.dot.r{background:#6FA3C7}.dot.w{background:transparent;border:1.5px solid #8E9AA2}.dot.s{background:#E0A526}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+@media (max-width:900px){.shell{grid-template-columns:1fr}.side{position:static;height:auto;padding:14px 18px}.side details:not([open]) summary{margin:0}}
+.areas{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:2px;background:var(--slag);border:2px solid var(--slag);margin-top:24px}
+.area{background:#EEF0EE;padding:16px 18px 18px;scroll-margin-top:12px}
+.area h3{font-size:19px;margin-bottom:6px}
+.area p{font-size:15px;margin:0 0 10px}
+.area dl{display:grid;grid-template-columns:76px 1fr;gap:3px 10px;margin:0;font-size:14px}
+.area dt{color:var(--slag-2)} .area dd{margin:0}
+ol.exps{list-style:none;padding:0;margin:24px 0 0;display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+.xp{background:#EEF0EE;border-top:6px solid var(--k,var(--parked));padding:12px 16px 16px;scroll-margin-top:12px}
+.xp.i{--k:var(--ember)}.xp.r{--k:#3B6E8F}.xp.w{--k:#9AA5AD}
+.xh{display:flex;justify-content:space-between;align-items:baseline}
+.xh b{font-variation-settings:"wdth" 125;font-weight:800;font-size:28px}
+.xh span{font-size:13px;color:var(--slag-2)}
+.xp h3{font-size:17px;margin:4px 0 6px}
+.xp p{font-size:14.5px;margin:0 0 6px}
+.xp .o{color:var(--slag-2)}
+.row{scroll-margin-top:12px}
+:target{outline:3px solid var(--ember);outline-offset:4px}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<aside class="side" aria-label="Site navigation"><details open><summary>Kindling</summary>
+<p class="sh">Pages</p><ul><li><a href="index.html">Home</a></li><li><a href="dev-dashboard.html">Engine development</a></li><li><a href="discovery/index.html">Kindling Discovery</a></li></ul>
+<p class="sh">This page</p><ul><li><a href="#how">How it works</a></li><li><a href="#areas">Game dev areas</a></li><li><a href="#experiments">AAA experiments</a></li><li><a href="#ledger">What we tried</a></li><li><a href="#previs">Previs</a></li><li><a href="#look">How the look moved</a></li><li><a href="#team">Team</a></li><li><a href="#lessons">What we learned</a></li></ul>
+<p class="sh">Game dev areas</p><ul><li><a href="#a-look">Concept and look development</a></li><li><a href="#a-characters">Characters</a></li><li><a href="#a-rig">Rigging and faces</a></li><li><a href="#a-anim">Animation</a></li><li><a href="#a-env">Environment art</a></li><li><a href="#a-world">Level and world</a></li><li><a href="#a-light">Lighting and look layer</a></li><li><a href="#a-design">Game design</a></li><li><a href="#a-narrative">Narrative</a></li><li><a href="#a-previs">Previs and trailer</a></li><li><a href="#a-techart">Technical art and performance</a></li><li><a href="#a-audio">Audio</a></li><li><a href="#a-engine">Engine and pipeline</a></li></ul>
+<p class="sh">AAA experiments</p><ul><li><a href="#e1"><i class="dot i" aria-hidden="true"></i><b>E1</b> Turnaround, head and hand sheets<span class="sr">, In progress</span></a></li><li><a href="#e2"><i class="dot w" aria-hidden="true"></i><b>E2</b> Mesh bake-off on the sheets<span class="sr">, Waiting</span></a></li><li><a href="#e3"><i class="dot r" aria-hidden="true"></i><b>E3</b> Rig standard v2 and head landmarks<span class="sr">, Ready</span></a></li><li><a href="#e4"><i class="dot r" aria-hidden="true"></i><b>E4</b> Prop sheet standard and 5 props<span class="sr">, Ready</span></a></li><li><a href="#e5"><i class="dot w" aria-hidden="true"></i><b>E5</b> PBR materials, the hero at 3 tiers<span class="sr">, Waiting</span></a></li><li><a href="#e6"><i class="dot w" aria-hidden="true"></i><b>E6</b> Face shapes and a video-driven clip<span class="sr">, Waiting</span></a></li><li><a href="#e7"><i class="dot r" aria-hidden="true"></i><b>E7</b> One streamed 1 km tile<span class="sr">, Ready</span></a></li><li><a href="#e8"><i class="dot w" aria-hidden="true"></i><b>E8</b> Mobile proof<span class="sr">, Waiting</span></a></li></ul>
+<p class="sh">Earlier experiments</p><ul><li><a href="#x-characters"><i class="dot p" aria-hidden="true"></i>Character pipeline<span class="sr">, Proven</span></a></li><li><a href="#x-previs"><i class="dot g" aria-hidden="true"></i>Previs pipeline<span class="sr">, Promising</span></a></li><li><a href="#x-mesh"><i class="dot i" aria-hidden="true"></i>Mesh and rig from plates<span class="sr">, In progress</span></a></li><li><a href="#x-prompted-anim"><i class="dot i" aria-hidden="true"></i>Prompted animation<span class="sr">, In progress</span></a></li><li><a href="#x-hand-anim"><i class="dot d" aria-hidden="true"></i>Hand-keyed animation<span class="sr">, Dead end</span></a></li><li><a href="#x-looks"><i class="dot d" aria-hidden="true"></i>Stylised looks<span class="sr">, Dead end</span></a></li><li><a href="#x-mayor"><i class="dot d" aria-hidden="true"></i>Mayor restyle<span class="sr">, Dead end</span></a></li><li><a href="#x-guardrails"><i class="dot d" aria-hidden="true"></i>Guardrail wording<span class="sr">, Dead end</span></a></li><li><a href="#x-dialogue"><i class="dot k" aria-hidden="true"></i>Live AI dialogue<span class="sr">, Parked</span></a></li><li><a href="#x-local-gen"><i class="dot k" aria-hidden="true"></i>Local image generation<span class="sr">, Parked</span></a></li></ul>
+</details></aside>
+<div class="content">
+
+<header class="hero"><div class="wrap">
+  <h1>Kindling</h1>
+  <p class="lede">An AI-assisted workflow engine for making a game with the output of a 10 to 20 person studio. One creative director, a team of named AI agents, and a nightly build he plays every morning.</p>
+  <figure class="strip">
+    <img src="img/strip-landscape.webp" width="2400" height="1180" alt="Four rows, one per character (Tomas, Ines, the Mayor, Tally). Left to right: painted concept art, a neutral character plate, a photoreal introduction shot, a realistic film poster and a 4K close-up of the face.">
+    <figcaption><span><strong>Proven:</strong> the character pipeline, from game concept art to a true-to-life 4K head shot, for all four characters.</span><span>Concept, plate, photoreal intro, poster, 4K close-up</span></figcaption>
+  </figure>
+</div></header>
+
+<main>
+<section id="how"><div class="wrap">
+  <h2>How it works</h2>
+  <p class="lede">Kindling is game-agnostic: it holds the rules, the agents, the pipeline, budgets and judges. The first game built on it is Kindling Discovery, whose lore and assets live in their own repo.</p>
+  <div class="flow" role="list">
+    <div role="listitem"><b>Steven</b><span>Creative director. Briefs, sketches, scores, money, merges.</span></div>
+    <div role="listitem"><b>Chat integrator</b><span>Claude in the phone or desktop app, often by voice. Turns decisions into tasks and specs.</span></div>
+    <div role="listitem"><b>Git handover</b><span>Queue and inbox in KindlingEngine; lore and assets in KindlingDiscovery.</span></div>
+    <div role="listitem"><b>Claude Code</b><span>Integrator and step builder on the PC. Builds in its own work repo.</span></div>
+    <div role="listitem"><b>Nightly build</b><span>Steven plays it each morning and scores Fun and Look out of 10.</span></div>
+  </div>
+  <p class="small">Every choice is optimised for those two morning scores, per dollar and per hour of Steven's attention.</p>
+
+  <div class="cols">
+    <div><h3>Control</h3><ul>
+      <li>The Unity editor is never automated; unattended work runs headless on a copy.</li>
+      <li>One control plane wraps Unity and every AI generator into typed results.</li>
+      <li>Main is read-only to every agent. Steven merges with one click.</li>
+    </ul></div>
+    <div><h3>Safety and money</h3><ul>
+      <li>Budgets are enforced before dispatch: hard ceiling, warn-and-hold, per-run caps.</li>
+      <li>No unattended paid generation. Unreadable spend means hold.</li>
+      <li>Per-role permission profiles, checked by a two-way canary at dispatch.</li>
+    </ul></div>
+    <div><h3>Quality</h3><ul>
+      <li>Done means a real end-to-end run with pasted evidence, never just unit tests.</li>
+      <li>Missing input fails closed with one clear reason.</li>
+      <li>Judges are separate, adversarial and read-only. They report; they never approve.</li>
+    </ul></div>
+    <div><h3>Persistence</h3><ul>
+      <li>A level is a master scene plus five owned layers: layout, design, environment, look, characters.</li>
+      <li>A reconciler applies diffs only and escalates conflicts.</li>
+      <li>A nightly clean-rebuild check proves the build is reproducible.</li>
+    </ul></div>
+  </div>
+
+  <h3 style="margin-top:48px">Build order</h3>
+  <p class="small">Each step starts when the previous one's evidence passes.</p>
+  <ol class="steps">
+    <li class="on">Project root abstraction and headless copy sync</li>
+    <li class="on">Pipeline package: Unity wrapper, typed CLI results</li>
+    <li class="on">Budget client</li>
+    <li class="on">Dashboard job runner</li>
+    <li class="on">Permission profiles and canary</li>
+    <li class="on">Build and player smoke test</li>
+    <li class="on">Stub morning report</li>
+    <li class="on">Reconciler and five layer scenes</li>
+    <li class="on">Work repo and one-click merge into main</li>
+    <li class="go">Production agents, then judges, then the watcher</li>
+  </ol>
+</div></section>
+
+<section id="areas"><div class="wrap">
+  <h2>Game dev areas</h2>
+  <p class="lede">Every area of making the game, who builds it, who judges it, where it stands, and its next experiment. The target is AAA PBR characters and environments that Unity scales down to mobile.</p>
+  <div class="areas">
+    <article class="area" id="a-look"><h3>Concept and look development</h3><p>Painterly key art is the style master; the photoreal canon is the reference for AAA materials, faces and light.</p><dl><dt>Builds</dt><dd>Lumen</dd><dt>Judges</dt><dd>Iris</dd><dt>Standard</dt><dd>S2 character sheets</dd><dt>Next</dt><dd><a href="#e1">E1 Turnaround, head and hand sheets</a></dd></dl></article>
+    <article class="area" id="a-characters"><h3>Characters</h3><p>Canon plates, posters and 4K close-ups exist for all four characters. No game mesh yet; the first mesh test is under way.</p><dl><dt>Builds</dt><dd>Clay</dd><dt>Judges</dt><dd>Prism, Iris</dd><dt>Standard</dt><dd>S5 mesh and UV, S6 materials</dd><dt>Next</dt><dd><a href="#e2">E2 Mesh bake-off on the sheets</a></dd></dl></article>
+    <article class="area" id="a-rig"><h3>Rigging and faces</h3><p>A Rigify game skeleton from the stylised phase. AAA needs rig v2: twist and finger bones, jaw and eye bones, 52 face shapes, and head landmarks.</p><dl><dt>Builds</dt><dd>Pivot (standard), Clay</dd><dt>Judges</dt><dd>Pivot, Gait</dd><dt>Standard</dt><dd>S3 rig v2, S4 landmarks</dd><dt>Next</dt><dd><a href="#e3">E3 Rig standard v2 and head landmarks</a></dd></dl></article>
+    <article class="area" id="a-anim"><h3>Animation</h3><p>Hand-keying with a judge loop was a dead end. The route now is prompted video and capture, retargeted onto the standard rig.</p><dl><dt>Builds</dt><dd>Flip</dd><dt>Judges</dt><dd>Gait, Pivot</dd><dt>Standard</dt><dd>Clip contracts (Pivot)</dd><dt>Next</dt><dd><a href="#e6">E6 Face shapes and a video-driven clip</a></dd></dl></article>
+    <article class="area" id="a-env"><h3>Environment art</h3><p>Signature props per location are proposed. Grid kits come from procedural modules; loose props from prop sheets through image-to-3D.</p><dl><dt>Builds</dt><dd>Kiln (prefabs), Moss (placement)</dd><dt>Judges</dt><dd>Iris, Prism</dd><dt>Standard</dt><dd>S7 prop sheets</dd><dt>Next</dt><dd><a href="#e4">E4 Prop sheet standard and 5 props</a></dd></dl></article>
+    <article class="area" id="a-world"><h3>Level and world</h3><p>The Episode 01 beach was blocked out from a hand sketch. The map is 8 by 8 km, with the first 1 km opened first, in streamed 256 m cells.</p><dl><dt>Builds</dt><dd>Ridge</dd><dt>Judges</dt><dd>Gauge, Anvil</dd><dt>Standard</dt><dd>S8 world grid and streaming</dd><dt>Next</dt><dd><a href="#e7">E7 One streamed 1 km tile</a></dd></dl></article>
+    <article class="area" id="a-light"><h3>Lighting and look layer</h3><p>A look layer exists from the stylised phase. AAA needs physical light units, calibrated exposure and grade, and GI and reflection probes per cell.</p><dl><dt>Builds</dt><dd>Lumen</dd><dt>Judges</dt><dd>Iris, Anvil</dd><dt>Standard</dt><dd>S6, S9</dd><dt>Next</dt><dd><a href="#e5">E5 PBR materials, the hero at 3 tiers</a></dd></dl></article>
+    <article class="area" id="a-design"><h3>Game design</h3><p>Controller, parkour gym and playthrough bot exist. Reach and step heights get re-measured on rig v2.</p><dl><dt>Builds</dt><dd>Flint</dd><dt>Judges</dt><dd>Gauge</dd><dt>Standard</dt><dd>Parkour metrics</dd><dt>Next</dt><dd><a href="#e3">E3 Rig standard v2 and head landmarks</a></dd></dl></article>
+    <article class="area" id="a-narrative"><h3>Narrative</h3><p>Episode 01 outline and a facts file with milestones and secrets. Dialogue is scripted ahead and voiced as pre-generated audio.</p><dl><dt>Builds</dt><dd>Quill</dd><dt>Judges</dt><dd>Facts file</dd><dt>Standard</dt><dd>Line format with lip-sync</dd><dt>Next</dt><dd><a href="#e6">E6 Face shapes and a video-driven clip</a></dd></dl></article>
+    <article class="area" id="a-previs"><h3>Previs and trailer</h3><p>Blender clay and depth guides drive approved photoreal keyframes. The video step is still to test.</p><dl><dt>Builds</dt><dd>Lumen, Flip</dd><dt>Judges</dt><dd>Gait, Iris</dd><dt>Standard</dt><dd>Shot list and keyframe rules</dd><dt>Next</dt><dd><a href="#x-previs">Previs pipeline</a></dd></dl></article>
+    <article class="area" id="a-techart"><h3>Technical art and performance</h3><p>Budgets per tier proposed: 80k, 40k and 15k triangles per hero. One source asset, scaled by Unity to medium and mobile.</p><dl><dt>Builds</dt><dd>Prism, Anvil</dd><dt>Judges</dt><dd>Anvil</dd><dt>Standard</dt><dd>S1 scale, S5, S9 quality tiers</dd><dt>Next</dt><dd><a href="#e8">E8 Mobile proof</a></dd></dl></article>
+    <article class="area" id="a-audio"><h3>Audio</h3><p>Parked. Planned once the first tile plays.</p><dl><dt>Builds</dt><dd>Echo</dd></dl></article>
+    <article class="area" id="a-engine"><h3>Engine and pipeline</h3><p>Steps 1 to 9 done. Next: the gate path fix (task 58) and the fresh dashboard (task 59).</p><dl><dt>Builds</dt><dd>Hearth, Ember</dd><dt>Judges</dt><dd>Anvil</dd><dt>Standard</dt><dd>Twelve rules</dd><dt>Next</dt><dd><a href="#x-core">Engine core</a></dd></dl></article>
+  </div>
+</div></section>
+
+<section id="experiments"><div class="wrap">
+  <h2>AAA experiments</h2>
+  <p class="lede">Eight small experiments, each with a done test and a spend cap Steven approves. Free tiers first.</p>
+  <ol class="exps">
+    <li class="xp i" id="e1"><div class="xh"><b>E1</b><span>In progress</span></div><h3>Turnaround, head and hand sheets</h3><p class="o">Lumen; judged by Gait, Pivot</p><p>Steven is generating the hero's sheets in the free image app.</p><p class="done"><strong>Done when:</strong> An orthographic A-pose sheet, a head sheet and a hand sheet that Gait and Pivot accept.</p></li>
+    <li class="xp w" id="e2"><div class="xh"><b>E2</b><span>Waiting</span></div><h3>Mesh bake-off on the sheets</h3><p class="o">Clay; judged by Prism, Iris; after E1</p><p class="done"><strong>Done when:</strong> One run each in 3 to 4 generators, scored on shape, face, hands, topology, UVs and cost.</p></li>
+    <li class="xp r" id="e3"><div class="xh"><b>E3</b><span>Ready</span></div><h3>Rig standard v2 and head landmarks</h3><p class="o">Pivot; judged by Gait; after E2</p><p>The written standard can start now; fitting waits for E2.</p><p class="done"><strong>Done when:</strong> The hero rigged through the test poses: no tearing, jaw opens, eyes turn in their sockets.</p></li>
+    <li class="xp r" id="e4"><div class="xh"><b>E4</b><span>Ready</span></div><h3>Prop sheet standard and 5 props</h3><p class="o">Prism, Kiln; judged by Iris</p><p class="done"><strong>Done when:</strong> 5 sheets to standard and 5 props through the import gate with LODs.</p></li>
+    <li class="xp w" id="e5"><div class="xh"><b>E5</b><span>Waiting</span></div><h3>PBR materials, the hero at 3 tiers</h3><p class="o">Prism, Lumen; judged by Iris, Anvil; after E3</p><p class="done"><strong>Done when:</strong> Skin, eyes, hair, cloth and brass; High beside the 4K close-up; Medium and Mobile frame times.</p></li>
+    <li class="xp w" id="e6"><div class="xh"><b>E6</b><span>Waiting</span></div><h3>Face shapes and a video-driven clip</h3><p class="o">Flip, Pivot; judged by Gait; after E3</p><p class="done"><strong>Done when:</strong> 52 face shapes pass blink, smile and talk; one run clip retargeted; Gait scores it.</p></li>
+    <li class="xp r" id="e7"><div class="xh"><b>E7</b><span>Ready</span></div><h3>One streamed 1 km tile</h3><p class="o">Ridge, Prism; judged by Anvil, Gauge</p><p class="done"><strong>Done when:</strong> A 1 km tile in 256 m cells streaming around a walking bot, with memory and hitches per tier.</p></li>
+    <li class="xp w" id="e8"><div class="xh"><b>E8</b><span>Waiting</span></div><h3>Mobile proof</h3><p class="o">Anvil; after E5, E7</p><p>Needs a test phone.</p><p class="done"><strong>Done when:</strong> The Mobile tier at 30 fps for 10 minutes on a mid-range phone.</p></li>
+  </ol>
+</div></section>
+
+<section id="ledger"><div class="wrap">
+  <h2>What we tried</h2>
+  <p class="lede">One month of building, from 25 October 2026. The honest list, including the parts that did not work.</p>
+  <div class="legend" aria-hidden="true">
+    <span><i style="background:var(--proven)"></i>Proven</span>
+    <span><i style="background:var(--promising)"></i>Promising or in progress</span>
+    <span><i style="background:var(--dead)"></i>Dead end</span>
+    <span><i style="background:var(--parked)"></i>Parked</span>
+  </div>
+  <div class="ledger">
+    <div class="row p" id="x-characters"><span class="st">Proven</span><div><h3>Character development pipeline</h3><p>Concept art, then a clean character plate, a photoreal intro, a realistic poster, and a 4K and HDR10 close-up. Done for Tomas, Ines, the Mayor and Tally.</p></div><p class="ev">Image generator edits with identity locks ("the same person", reference attached), then a local upscale: two Lanczos passes with sharpening, luminance clarity, grain, and a PQ encode to 10-bit AVIF. Main limit: generator sources are only about 840 by 1260 pixels.</p></div>
+    <div class="row p" id="x-core"><span class="st">Proven</span><div><h3>Engine core, steps 1 to 9</h3><p>Project roots, the Unity control plane, budget client, dashboard job runner, permission profiles, smoke-tested builds, the morning report, the reconciler and the work repo with a one-click merge.</p></div><p class="ev">Each step closed on a real end-to-end run with pasted evidence; reports live in <code>reports/</code>.</p></div>
+    <div class="row p" id="x-gate"><span class="st">Proven</span><div><h3>Input gate and facts file</h3><p>Every request is checked against the style guide and a facts file before any paid generation. Facts can be scoped to story milestones, and secrets fail closed until they are revealed.</p></div><p class="ev">A test request that leaked a story secret was refused. Spend went to well-formed prompts only.</p></div>
+    <div class="row p" id="x-level"><span class="st">Proven</span><div><h3>Level agent and greybox judges</h3><p>The Episode 01 beach was laid out and blocked out from Steven's hand sketch, and judges graded the greybox against canon concept art.</p></div><p class="ev">Canon wins over sketches and briefs; every conflict is logged for Steven.</p></div>
+    <div class="row p" id="x-handover"><span class="st">Proven</span><div><h3>Voice to git handover</h3><p>Steven talks to the chat integrator from his phone; tasks, specs and lore are committed and pushed; Claude Code pulls at session start.</p></div><p class="ev">Replaced the Google Drive folder on 25 November 2026.</p></div>
+    <div class="row g" id="x-previs"><span class="st">Promising</span><div><h3>Previs pipeline</h3><p>Block the shot in Blender, render clay and depth guides, generate photoreal keyframes against the guides, then animate between keyframes with a video model.</p></div><p class="ev">Four keyframes for Tomas's alley swing were approved on 24 November. Still to try: the video step (Kling 4.0 with keyframes, Luma Ray3.2 as the comparison).</p></div>
+    <div class="row g" id="x-mesh"><span class="st">In progress</span><div><h3>Mesh and rig from canon plates</h3><p>Image to 3D from the four-view plates in free tiers of Tripo, Meshy and Hunyuan3D, then auto-retopology and a humanoid rig.</p></div><p class="ev">Free tiers first; paid fallback capped at 1 US dollar.</p></div>
+    <div class="row g" id="x-prompted-anim"><span class="st">In progress</span><div><h3>Prompted animation</h3><p>Image to mesh to rig to video-guided, physics-limited clips, instead of hand-keying every move.</p></div><p class="ev">Part A needs no spend; Part B waits for Steven's budget approval.</p></div>
+    <div class="row d" id="x-hand-anim"><span class="st">Dead end</span><div><h3>Hand-built animation with a judge loop</h3><p>An Animator agent hand-keyed clips in Blender and an Animation Director judged them on measured contact sheets, round after round.</p></div><p class="ev">After 33 rounds the score sat at 3 to 4 out of 10. Foot slip dropped from 26.6 to about 5 cm, but missing moves and new regressions held the score. Filmed reference retargeted with MediaPipe scored 3/10. Parked on 21 November.</p></div>
+    <div class="row d" id="x-looks"><span class="st">Dead end</span><div><h3>Stylised look families</h3><p>A comic-ink style, then Paper-Riso cut paper, then a Paper-Ink blend were each accepted and later replaced.</p></div><p class="ev">The painterly key art replaced them as style master on 21 November, and the photoreal track grew from it. The Paper-Ink documents still need re-baselining.</p></div>
+    <div class="row d" id="x-mayor"><span class="st">Dead end</span><div><h3>Restyling the Mayor to match the hero</h3><p>Pushing the Mayor's master image toward the hero's key art lost what made him work.</p></div><p class="ev">His original key art stayed the master; only the backdrop changes.</p></div>
+    <div class="row d" id="x-guardrails"><span class="st">Dead end</span><div><h3>Generator wording that trips guardrails</h3><p>Phrases like "same photograph", "same face", "no retouching", IMAX or robot names led to fraud or third-party content blocks.</p></div><p class="ev">Edits that say "Edit this image of the boy" and "the same person" work. Tally's poster stayed an upscale because the edit route stayed blocked.</p></div>
+    <div class="row k" id="x-dialogue"><span class="st">Parked</span><div><h3>Live AI dialogue in the game</h3><p>A small local LLM with Kokoro voice at runtime.</p></div><p class="ev">Dialogue is now scripted ahead by the Narrative agent and voiced as pre-generated audio.</p></div>
+    <div class="row k" id="x-local-gen"><span class="st">Parked</span><div><h3>Local image generation</h3><p>ComfyUI with a LoRA on a small open model.</p></div><p class="ev">The development GPU has 4 GB, so hosted generators come first until a workstation exists.</p></div>
+  </div>
+</div></section>
+
+<section id="previs"><div class="wrap">
+  <h2>The previs pipeline</h2>
+  <p class="lede">Shot 4 of Tomas's 30-second trailer: he sprints up a stepped alley, swings from a beam over a barrel barricade and runs out to the castle view, in one continuous 5-second shot.</p>
+  <div class="guides">
+    <figure><img src="img/clay-start.webp" width="900" height="506" alt="Blender clay render of the alley with a grey figure at the start position" loading="lazy"><figcaption class="small">Clay guide, start: camera, layout and the figure's size in frame.</figcaption></figure>
+    <figure><img src="img/clay-flight.webp" width="900" height="506" alt="Blender clay render of the figure in flight above the barrels" loading="lazy"><figcaption class="small">Clay guide, flight at 3.0 s.</figcaption></figure>
+    <figure><img src="img/depth-flight.webp" width="900" height="506" alt="Depth pass of the same flight frame" loading="lazy"><figcaption class="small">Depth guide, attached to the image edit so the generator keeps the geometry.</figcaption></figure>
+  </div>
+  <div class="chain">
+    <figure><img src="img/shot4-start.webp" width="900" height="506" alt="Tomas sprinting up the alley toward a low camera" loading="lazy"><figcaption><b>Start, 0.0 s</b> Sprint toward the lens.</figcaption></figure>
+    <figure><img src="img/shot4-swing.webp" width="900" height="506" alt="Tomas swinging one-handed from a timber beam, legs forward" loading="lazy"><figcaption><b>Swing, 2.6 s</b> One hand on the beam.</figcaption></figure>
+    <figure><img src="img/shot4-flight.webp" width="900" height="506" alt="Tomas airborne over barrels, tucked" loading="lazy"><figcaption><b>Flight, 3.0 s</b> Over the barricade.</figcaption></figure>
+    <figure><img src="img/shot4-end.webp" width="900" height="506" alt="Tomas sprinting out of the alley onto a sunlit terrace" loading="lazy"><figcaption><b>End, 5.0 s</b> Out onto the terrace.</figcaption></figure>
+  </div>
+  <p class="small" style="margin-top:16px">Approved 24 November 2026. Next: feed the four keyframes to a keyframe-capable video model and compare two vendors, after checking their terms.</p>
+</div></section>
+
+<section id="look"><div class="wrap">
+  <h2>How the look moved</h2>
+  <p class="lede">Each style was accepted for a while and then replaced, as the characters moved from flat illustration toward 3D and film.</p>
+  <div class="journey">
+    <figure class="x"><div class="noimg">No image kept</div><figcaption><b>Comic ink</b>Bold outlines and halftone. Replaced the day it was set.</figcaption></figure>
+    <figure class="x"><img src="img/hero-paperriso.webp" width="700" height="382" alt="Paper-Riso cut-paper illustration of the hero standing in surf" loading="lazy"><figcaption><b>Paper-Riso and Paper-Ink</b>Cut-paper collage in risograph inks. Replaced on 21 November.</figcaption></figure>
+    <figure class="x"><img src="img/tally-r1.webp" width="700" height="490" alt="Early Tally concept: a teal biped in a glowing tide pool" loading="lazy"><figcaption><b>Early Tally rounds</b>Chunky, then mannequin-like. Rejected.</figcaption></figure>
+    <figure class="v"><img src="img/concept-tomas.webp" width="900" height="506" alt="Painterly key art of Tomas holding a green-glowing lantern at dawn" loading="lazy"><figcaption><b>Painterly key art</b>Style master for every character since 21 November.</figcaption></figure>
+    <figure class="v"><img src="img/closeup-tomas.webp" width="600" height="900" alt="Photoreal 4K close-up of Tomas's face" loading="lazy"><figcaption><b>Photoreal track</b>Posters and close-ups for a live-action companion series.</figcaption></figure>
+  </div>
+</div></section>
+
+<section id="team"><div class="wrap">
+  <h2>The team</h2>
+  <p class="lede">Every craft has a short name, themed on fire and making. They are handles for roles, not people, and the same team builds both the engine and the game.</p>
+  <div class="team">
+    <div>
+      <h3>Builders</h3>
+      <dl>
+        <div class="m"><dt>Hearth</dt><dd>Integrator<em>Core rules, contracts between streams, dashboard, budgets, reconciler.</em></dd></div>
+        <div class="m"><dt>Ember</dt><dd>Watcher<em>Reads logs hourly, finds root causes, files to-dos for Steven.</em></dd></div>
+        <div class="m"><dt>Flint</dt><dd>Design<em>Mechanics, timings, controller, playthrough bot, smoke tests.</em></dd></div>
+        <div class="m"><dt>Ridge</dt><dd>Level<em>Layout spec, blockout, fly-through captures.</em></dd></div>
+        <div class="m"><dt>Lumen</dt><dd>Art, look development<em>Concept direction, look layer, asset briefs, generator prompts.</em></dd></div>
+        <div class="m"><dt>Clay</dt><dd>Art, character<em>Character models, kits, rig and skin.</em></dd></div>
+        <div class="m"><dt>Flip</dt><dd>Art, animator<em>Clips and transitions on the control rig.</em></dd></div>
+        <div class="m"><dt>Kiln</dt><dd>Art, prefab factory<em>Structures, landmarks and assets, never placed.</em></dd></div>
+        <div class="m"><dt>Moss</dt><dd>Art, placement<em>Composes prefabs on layout anchors.</em></dd></div>
+        <div class="m"><dt>Quill</dt><dd>Narrative<em>Lore, dialogue, how story reaches the player.</em></dd></div>
+        <div class="m later"><dt>Echo</dt><dd>Audio<em>Named slot, parked.</em></dd></div>
+      </dl>
+    </div>
+    <div>
+      <h3>Judges</h3>
+      <dl>
+        <div class="m"><dt>Gauge</dt><dd>Game Design Director<em>Fun, mechanics, pacing.</em></dd></div>
+        <div class="m"><dt>Iris</dt><dd>Art Director<em>Overall look, and prefab look before placement.</em></dd></div>
+        <div class="m"><dt>Anvil</dt><dd>Technical Director<em>Performance, build health, nightly reproducibility.</em></dd></div>
+        <div class="m"><dt>Gait</dt><dd>Animation Director<em>How characters move, against the motion style sheet.</em></dd></div>
+        <div class="m"><dt>Pivot</dt><dd>Technical Animation Director<em>Proposed. Clip contracts, the rig standard, plants and blends.</em></dd></div>
+        <div class="m"><dt>Prism</dt><dd>Technical Art Director<em>Proposed. Art budgets, import gate, shader cost.</em></dd></div>
+        <div class="m later"><dt>Lore</dt><dd>Narrative judge<em>Later.</em></dd></div>
+      </dl>
+      <p class="small" style="margin-top:18px">Every verdict starts with the judge's name, for example "Gait 4/10". Judges never approve gates; Steven does.</p>
+    </div>
+  </div>
+</div></section>
+
+<section id="lessons"><div class="wrap">
+  <h2>What we learned</h2>
+  <ul class="lessons">
+    <li><b>Lock identity before resolution.</b> Upscaling a face that drifted only makes the drift sharper. Approve the face at low resolution first.</li>
+    <li><b>A judge loop cannot rescue the wrong method.</b> 33 measured rounds of hand-keyed motion circled at 3 to 4 out of 10. Changing the route beat polishing the clips.</li>
+    <li><b>Guides beat words for camera and layout.</b> Clay and depth renders from Blender hold framing that prompts alone could not.</li>
+    <li><b>Spend after the gate, not before.</b> Free app tests and the input gate caught most bad prompts before any paid call.</li>
+    <li><b>Generators are rented.</b> Tools turn over every few months, so the engine owns the tickets, gates and ingest, not the models.</li>
+    <li><b>Steven's attention is the scarcest resource.</b> Routine decisions are delegated; only money, rules and creative calls reach him.</li>
+  </ul>
+</div></section>
+</main>
+
+<footer><div class="wrap">
+  Kindling engine. Last updated 25 November 2026. The game it builds: <a href="discovery/index.html">Kindling Discovery</a>.
+</div></footer>
+</div>
+</div>
+</body>
+</html>
