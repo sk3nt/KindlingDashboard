@@ -23,7 +23,7 @@ def common(name):
 STYLE = common("STYLE REFS")
 COMMONS = [("Location plate", common("COMMON PLATE")), ("Isolated structure sheet", common("COMMON STRUCTURE SHEET")), ("Prop sheet (S7)", common("COMMON PROP SHEET"))]
 items = []
-for m in re.finditer(r"^((?:V|C)\d|S-[VC]\d|P\d+)( \([^)]*\))?: (.*)$|^((?:S-[VC]\d|P\d+)) ([^:]+): (.*)$", TXT, re.M):
+for m in re.finditer(r"^((?:V|C)\d|S-[VC]\d+|P\d+)( \([^)]*\))?: (.*)$|^((?:S-[VC]\d+|P\d+)) ([^:]+): (.*)$", TXT, re.M):
     if m.group(1):
         iid, paren, body = m.group(1), (m.group(2) or "").strip(" ()"), m.group(3)
         title = body.split(".")[0] if iid in ("V0", "C0") else ""
@@ -71,6 +71,8 @@ def group(prefix):
     return "".join(card(*it) for it in items if re.match(prefix, it[0]))
 
 
+REFS = re.findall(r"^REF ([^:]+): (.*)$", TXT, re.M)
+refhtml = "".join(f"<li><b>{E(n)}</b> {E(t)}</li>" for n, t in REFS)
 refs = "".join(f'<li class="cc"><div class="cl">{E(lab)}</div>{image(k, lab)}</li>' for k, lab in [
     ("v1", "Village square, empty plate"), ("v1b", "Market stall"), ("v2", "Narrow alley"), ("v3", "Village steps and coast"),
     ("c1", "Castle stairs"), ("c2", "Castle gate"), ("c3", "Castle terrace, view south")])
@@ -86,6 +88,9 @@ SECTION = f'''<!--environment:start-->
   <h3 class="ch3">Common prompts</h3>
   <p class="o">Each prompt below starts from one of these. The full set is in <code>Production/Design/prompts/environment-prompts.md</code> in the game repo.</p>
   <ol class="cprompts">{commons}</ol>
+  <h3 class="ch3">Real-world references</h3>
+  <p class="o">Places that look like ours, used for ideas only. Prompts describe the feature and never name the place, so the generator does not copy a real landmark.</p>
+  <ul class="envrefs">{refhtml}</ul>
   <div class="crow"><h3>Village: key locations</h3><ol class="cstrip envgrid">{group(r"V\d")}</ol></div>
   <div class="crow"><h3>Castle: key locations</h3><ol class="cstrip envgrid">{group(r"C\d")}</ol></div>
   <div class="crow"><h3>Isolated key structures</h3><p class="o">Grid modules (house walls, stairs, roofs, terraces) become procedural kits later; their sheets are the look reference. Landmarks can be meshed from the sheet.</p><ol class="cstrip envgrid">{group(r"S-")}</ol></div>
@@ -94,7 +99,8 @@ SECTION = f'''<!--environment:start-->
     <li><b>Clean plates</b> for the frames that have a character in them: V2, V3, C1, C2, C3 (same camera, character removed).</li>
     <li><b>V0, the village establishing shot,</b> from the layout of record, with the square plate attached for the look.</li>
     <li><b>Village plates V4 to V7,</b> then castle plates C0, C4 and C5.</li>
-    <li><b>Structure sheets,</b> landmarks first: S-V4 market stall, S-V5 footbridge, S-C1 gatehouse, S-C4 keep.</li>
+    <li><b>Structure sheets,</b> landmarks first: S-V4 market stall, the bridge (S-V5 or S-V10), S-C1 gatehouse, S-C4 keep, S-C6 gate tunnel.</li>
+    <li><b>Steven decides</b> whether the timber footbridge becomes a fortified stone bridge with a gate tower (S-V10).</li>
     <li><b>Prop sheets P1 to P5</b> for E4, then the signature props.</li>
     <li><b>Steven approves</b> the 9 locations and caps in the props list (still a draft).</li>
   </ol></div>
@@ -107,6 +113,7 @@ ol.envref{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));margin-top:1
 ol.envref .im{height:120px}
 .cc .loc{font-weight:400;color:var(--slag-2)}
 #environment code{word-break:break-all}
+ul.envrefs{margin:10px 0 0;padding-left:20px;max-width:900px}ul.envrefs li{margin:0 0 8px;font-size:15px}
 /*environment:end*/'''
 
 p = ROOT / "engine.html"
