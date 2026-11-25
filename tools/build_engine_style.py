@@ -29,6 +29,20 @@ RULES = [
     ("Materials", "Honey limestone, lime plaster, terracotta roofs and pots, weathered timber, worn stone steps and cobbles. Clean and lived-in, never grimy."),
     ("Characters", "Costumes read against the stone: Tomas in teal stripes, Ines in cream, the Mayor in red, orange and gold patchwork, Tally in olive and orange."),
 ]
+LOOKS = [
+    ("base", "Base: the film frame as generated", "Plain photoreal. Beautiful, but it could be any film or game set in a Mediterranean village.", ""),
+    ("a", "A. Golden memory", "Highlights glow and bleed red at the edges like film halation, blacks lift slightly, warm highlights, fine grain. The world feels remembered, like a summer you once had.", "Recommended base. Cheap in Unity (bloom, a halation pass, a colour grade, grain); scales to mobile by dropping the halation."),
+    ("b", "B. Fresco", "Matte, chalky, lower contrast and saturation, like faded wall painting. Calm and distinctive.", "Risk: reads washed out on bright screens, and the player and ledges lose contrast."),
+    ("c", "C. Selective colour", "The world is pulled towards stone and dust; only textiles, flowers and Ora keep full colour. Colour becomes the story: as the village thrives, colour returns.", "Recommended as the story layer on top of A: the struggling-to-thriving look keys use it."),
+    ("d", "D. Painted distance", "Near things photoreal, far things simplified like a painting. Bridges the painterly key art and the photoreal canon.", "Strongest identity, hardest to build: a distance-based painterly filter per tier. This crude mock-up also outlines edges, which a real build would avoid."),
+]
+SIGNATURE = [
+    ("First light", "The world lives mostly in dawn and the golden hour, because Tomas carries the first light. Midday and night are rare and meaningful."),
+    ("Ora has its own optics", "Ora green is the only saturated light, with its own halo, flicker and green caustics on nearby stone; nothing else glows like it."),
+    ("Filmed, not rendered", "Halation, grain and a gentle lens roll-off on every frame: the camera has a personality."),
+    ("Colour as progress", "Faded and dusty where life has gone out of a place; bright cloth and flowers where it comes back."),
+    ("Hand-made world", "Crooked, patched, repaired surfaces and textiles; nothing factory-clean or symmetrical."),
+]
 KEYS = [
     ("Village dawn (base key)", "The square as measured above. Warm, pink and peach, accents bright.", "Have it"),
     ("Midday", "Higher contrast, shorter shadows, bluer sky, stone near white. Accents look flatter.", "To write"),
@@ -65,6 +79,10 @@ def sw(name, hx):
 
 groups = "".join(f'<div class="swg"><h4>{E(t)}</h4><p class="o">{E(d)}</p><ul class="sws">{"".join(sw(*s) for s in ss)}</ul></div>' for t, d, ss in GROUPS)
 rules = "".join(f"<li><b>{E(a)}.</b> {E(b)}</li>" for a, b in RULES)
+signature = "".join(f"<li><b>{E(a)}.</b> {E(b)}</li>" for a, b in SIGNATURE)
+looks = "".join(
+    f'<li class="cc"><div class="cl">{E(t)}</div><a class="im" href="img/style/look-{k}-full.webp" target="_blank" rel="noopener" title="Open full size in a new window"><img src="img/style/look-{k}.webp" alt="{E(t)}" loading="lazy"></a><p class="np" style="color:var(--slag)">{E(d)}</p>'
+    + (f'<p class="np">{E(n)}</p>' if n else "") + "</li>" for k, t, d, n in LOOKS)
 keys = "".join(f"<tr><td><b>{E(a)}</b></td><td>{E(b)}</td><td>{E(c)}</td></tr>" for a, b, c in KEYS)
 consts = "".join(f"<li>{E(x)}</li>" for x in CONST)
 missing = "".join(f"<li><b>{E(a)}.</b> {E(b)}</li>" for a, b in MISSING)
@@ -73,7 +91,14 @@ donts = "".join(f"<li>{E(x)}</li>" for x in DONT)
 SECTION = f'''<!--style:start-->
 <section id="style"><div class="wrap">
   <h2>Look development: style guide</h2>
-  <p class="lede">The look in one place: palette, light and rules for every character, location and prop. The palette is measured from the village square film frame. This is a draft for Steven; the repo style guide changes only when he accepts it.</p>
+  <p class="lede">The look in one place: palette, light and rules for every character, location and prop. Paper-Ink is retired; this is the photoreal direction. The palette is measured from the village square film frame. This is a draft for Steven; the repo style guide changes only when he accepts it.</p>
+  <h3 class="ch3">What makes the photoreal look ours</h3>
+  <p class="o">Photoreal alone is not a look, so these five signatures carry the identity, whatever the grade.</p>
+  <ul class="srules">{signature}</ul>
+  <h3 class="ch3">Grade directions: pick one</h3>
+  <p class="o">Quick local grades of the same film frame, to compare directions; not final. Click to open full size. My recommendation: A as the base grade, with C as the story layer.</p>
+  <ol class="cstrip lookdirs">{looks}</ol>
+  <h3 class="ch3">Palette</h3>
   <div class="stylehero"><a class="im" href="img/environment/v1-full.webp" target="_blank" rel="noopener" title="Open full size in a new window"><img src="img/environment/v1.webp" alt="The village square at dawn, the palette source" loading="lazy"></a>
   <p class="o">Palette source: the empty village square plate. Click to open full size.</p></div>
   {groups}
@@ -85,6 +110,7 @@ SECTION = f'''<!--style:start-->
   <p class="o" style="margin-top:12px"><b>Stays the same in every key:</b></p><ul class="srules">{consts}</ul>
   <h3 class="ch3">Still to write</h3><ul class="srules">{missing}</ul>
   <div class="todo"><h3 class="ch3">Next to do</h3><ol class="nexts">
+    <li><b>Steven picks a grade direction</b> (A to D, or a mix).</li>
     <li><b>Steven approves or changes the palette and rules.</b></li>
     <li><b>Astrid writes the first look keys:</b> night and the castle first (most different from the base), then the struggling and thriving village.</li>
     <li><b>Write it into the repo style guide</b> (a gated file: Steven accepts the change, and earlier gate results are re-run).</li>
@@ -102,6 +128,7 @@ ul.sws{list-style:none;margin:10px 0 0;padding:0;display:grid;grid-template-colu
 .sw b{display:block;font-size:14px}.sw code{font-size:12.5px;color:var(--slag-2)}
 table.keys{border-collapse:collapse;width:100%;max-width:980px;margin-top:10px;font-size:14.5px}table.keys th,table.keys td{text-align:left;vertical-align:top;padding:8px 10px;border-bottom:1px solid var(--ash-2)}@media (min-width:700px){table.keys td:first-child{white-space:nowrap}}
 ul.srules{margin:8px 0 0;padding-left:20px;max-width:900px}ul.srules li{margin:0 0 6px;font-size:15px}
+ol.lookdirs{grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}ol.lookdirs .im{height:160px}
 /*style:end*/'''
 
 p = ROOT / "engine.html"
