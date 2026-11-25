@@ -27,34 +27,41 @@ STEPS = [
     (10, "Production agents, then judges, then the watcher", "step10"),
 ]
 STANDARDS = [
-    ("S1", "Scale, units and axes", "Prism"),
-    ("S2", "Character sheet standard", "Lumen, Gait, Pivot"),
-    ("S3", "Rig standard v2", "Pivot"),
-    ("S4", "Head and face landmarks", "Pivot"),
-    ("S5", "Mesh and UV standard", "Prism"),
-    ("S6", "Material library and PBR rules", "Prism, Lumen"),
-    ("S7", "Prop sheet standard", "Prism, Lumen"),
-    ("S8", "World grid and streaming", "Ridge, Prism, Anvil"),
-    ("S9", "Quality tiers", "Prism, Anvil"),
+    ("S1", "Scale, units and axes", "Theo"),
+    ("S2", "Character sheet standard", "Lena, Albin, Tilda"),
+    ("S3", "Rig standard v2", "Tilda"),
+    ("S4", "Head and face landmarks", "Tilda"),
+    ("S5", "Mesh and UV standard", "Theo"),
+    ("S6", "Material library and PBR rules", "Theo, Lena"),
+    ("S7", "Prop sheet standard", "Theo, Lena"),
+    ("S8", "World grid and streaming", "Leo, Theo, Tor"),
+    ("S9", "Quality tiers", "Theo, Tor"),
 ]
 # Experiments: queue task number, short name, owner, depends on
 EXPERIMENTS = [
-    (50, "E1", "Turnaround, head and hand sheets", "Lumen", []),
-    (51, "E2", "Mesh bake-off", "Clay", ["E1"]),
-    (52, "E3", "Rig standard v2 and landmarks", "Pivot", ["E2"]),
-    (53, "E4", "Prop sheets and 5 props", "Prism, Kiln", []),
-    (54, "E5", "PBR materials, hero at 3 tiers", "Prism, Lumen", ["E3"]),
-    (55, "E6", "Face shapes and video-driven clip", "Flip, Pivot", ["E3"]),
-    (56, "E7", "One streamed 1 km tile", "Ridge, Prism", []),
-    (57, "E8", "Mobile proof", "Anvil", ["E5", "E7"]),
+    (50, "E1", "Turnaround, head and hand sheets", "Lena", []),
+    (51, "E2", "Mesh bake-off", "Clara", ["E1"]),
+    (52, "E3", "Rig standard v2 and landmarks", "Tilda", ["E2"]),
+    (53, "E4", "Prop sheets and 5 props", "Theo, Per", []),
+    (54, "E5", "PBR materials, hero at 3 tiers", "Theo, Lena", ["E3"]),
+    (55, "E6", "Face shapes and video-driven clip", "Alva, Tilda", ["E3"]),
+    (56, "E7", "One streamed 1 km tile", "Leo, Theo", []),
+    (57, "E8", "Mobile proof", "Tor", ["E5", "E7"]),
 ]
-OPEN_DECISIONS = [
-    "Realism level: fully photoreal or stylised real (production-targets.md).",
-    "Character heights, and Tally's scale.",
-    "Lead platform: PC first, mobile as a scaled tier (default).",
-    "New crafts and names: world streaming, VFX.",
-    "Let Claude Code commit and push handover/ only, so its queue notes reach git (rule 10).",
-]
+OPEN_DECISIONS = []
+# Epics: group of queue task numbers. A task can also carry "- Epic: name" in the queue, which wins.
+EPICS = {
+    "Engine core": [0, 5, 6, 9, 10, 11, 12, 15, 18, 19, 20, 22, 25, 26, 27, 29, 33, 49, 58, 60],
+    "Dashboard": [8, 21, 23, 30, 34, 59],
+    "AAA pipeline": [50, 51, 52, 53, 54, 55, 56, 57, 61],
+    "Animation": [43, 44, 45],
+    "Characters": [46, 48],
+    "Look and art": [1, 2, 3, 4, 13, 14, 24, 47],
+    "Story and design": [7, 16, 17, 41],
+    "Level and greybox": [31, 32, 42],
+    "Research": [28],
+}
+EPIC_OF = {n: e for e, ns in EPICS.items() for n in ns}
 
 
 def classify(status, body):
@@ -64,6 +71,8 @@ def classify(status, body):
         if "superseded" in s or "by integrator" in s:
             return "done"
         return "done" if accepted or "accepted" in s else "review"
+    if s.startswith("superseded"):
+        return "done"
     if s.startswith("parked"):
         return "parked"
     if s.startswith("in-progress"):
@@ -90,7 +99,9 @@ def parse_queue(text):
         n, title, body = int(m.group(1)), m.group(2).strip(), m.group(3)
         st = re.search(r"^- Status: (.*)$", body, re.M)
         status = st.group(1).strip() if st else ""
-        tasks.append({"n": n, "title": title, "status": status, "k": classify(status, body)})
+        ep = re.search(r"^- Epic: (.*)$", body, re.M)
+        epic = ep.group(1).strip() if ep else EPIC_OF.get(n, "Unsorted")
+        tasks.append({"n": n, "title": title, "status": status, "epic": epic, "k": classify(status, body)})
     dec = re.findall(r"^- (?:\*\*)?(?:2026-\d\d-\d\d|[A-Z][^.]*\(Steven, chat 2026-\d\d-\d\d\)).*$", text, re.M)
     return tasks, dec[-6:]
 
@@ -113,10 +124,10 @@ def main():
     counts = {k: sum(1 for t in tasks if t["k"] == k) for k in ORDER}
     total = len(tasks)
     bar = "".join(f'<span class="seg {k}" style="flex:{counts[k]}" title="{LABEL[k]}: {counts[k]}"></span>' for k in ORDER if counts[k])
-    legend = "".join(f'<button class="chip {k}" data-k="{k}" aria-pressed="false"><i></i>{LABEL[k]} <b>{counts[k]}</b></button>' for k in ORDER if counts[k])
+    legend = "".join(f'<button class="chip {k}" data-k="{k}" aria-pressed="false"><i></i>{LABEL[k]} <b>{counts[k]}</b></button>' for k in ORDER if counts[k] and k in ("active", "ready", "blocked", "parked"))
 
     needs = [t for t in tasks if t["k"] in ("steven", "review")]
-    needs_html = "".join(f'<li><span class="n">{t["n"]}</span> {esc(t["title"])}<em>{LABEL[t["k"]]}</em></li>' for t in needs)
+    needs_html = "".join(f'<li id="N{t["n"]}"><span class="n">T{t["n"]}</span> {esc(t["title"])}<em>{LABEL[t["k"]]}: {esc(t["status"][:140])}</em></li>' for t in needs)
     needs_html += "".join(f'<li><span class="n">?</span> {esc(d)}<em>Open decision</em></li>' for d in OPEN_DECISIONS)
 
     exp_html = ""
@@ -125,7 +136,7 @@ def main():
         k = t["k"] if t else "blocked"
         exp_html += (f'<div class="exp {k}"><div class="eh"><b>{e}</b><span>{LABEL[k]}</span></div>'
                      f'<p>{esc(name)}</p><small>{esc(owner)}' + (f' · after {", ".join(dep)}' if dep else '') +
-                     f' · task {n}</small></div>')
+                     f' · <a href="#T{n}">T{n}</a></small></div>')
 
     steps_html = ""
     for i, name, key in STEPS:
@@ -138,14 +149,23 @@ def main():
 
     std_html = "".join(f'<tr><td><b>{s}</b></td><td>{esc(n)}</td><td>{esc(o)}</td><td><span class="pill ready">Not started</span></td></tr>' for s, n, o in STANDARDS)
 
-    rows = "".join(f'<tr data-k="{t["k"]}"><td class="num">{t["n"]}</td><td>{esc(t["title"])}</td><td><span class="pill {t["k"]}">{LABEL[t["k"]]}</span></td><td class="st">{esc(t["status"][:160])}</td></tr>' for t in tasks)
+    def row(t):
+        return f'<tr id="T{t["n"]}" data-k="{t["k"]}"><td class="num">T{t["n"]}</td><td class="ep">{esc(t["epic"])}</td><td>{esc(t["title"])}</td><td><span class="pill {t["k"]}">{LABEL[t["k"]]}</span></td><td class="st">{esc(t["status"][:160])}</td></tr>'
+    open_tasks = [t for t in tasks if t["k"] in ("active", "ready", "blocked", "parked")]
+    pm = re.search(r"^Priority order[^:\n]*: ([\d, ]+)$", text, re.M)
+    prio = [int(x) for x in re.findall(r"\d+", pm.group(1))] if pm else []
+    rank = {n: i for i, n in enumerate(prio)}
+    open_tasks.sort(key=lambda t: (rank.get(t["n"], 999), ["active", "ready", "blocked", "parked"].index(t["k"]), t["n"]))
+    rows = "".join(row(t) for t in open_tasks)
+    done_tasks = [t for t in tasks if t["k"] == "done"]
+    archive = "".join(row(t) for t in done_tasks)
     dec_html = "".join(f"<li>{esc(re.sub(r'[*`]', '', d))[:420]}</li>" for d in reversed(decisions))
 
     page = TEMPLATE
     for k, v in {"%BUILT%": built, "%COMMIT%": esc(commit), "%TOTAL%": str(total), "%BAR%": bar, "%LEGEND%": legend,
                  "%NEEDS%": needs_html, "%EXP%": exp_html, "%STEPS%": steps_html, "%STD%": std_html,
-                 "%ROWS%": rows, "%DEC%": dec_html, "%ACTIVE%": str(counts["active"]), "%READY%": str(counts["ready"]),
-                 "%STEVEN%": str(len(needs)), "%DONE%": str(counts["done"] + counts["review"])}.items():
+                 "%ROWS%": rows, "%ARCHIVE%": archive, "%NARCH%": str(len(done_tasks)), "%NOPEN%": str(len(open_tasks)), "%DEC%": dec_html, "%ACTIVE%": str(counts["active"]), "%READY%": str(counts["ready"]),
+                 "%STEVEN%": str(len(needs)), "%NNEEDS%": str(len(needs) + len(OPEN_DECISIONS)), "%DONE%": str(counts["done"] + counts["review"])}.items():
         page = page.replace(k, v)
     OUT.write_text(page, encoding="utf-8")
     print(f"wrote {OUT}: {total} tasks from {QUEUE}")
@@ -206,10 +226,12 @@ ul.needs{list-style:none;margin:0;padding:0;border-top:2px solid var(--slag)}
 ul.needs li{padding:9px 0;border-bottom:1px solid #C3C9C5;display:grid;grid-template-columns:36px 1fr;gap:0 8px;font-size:14.5px}
 ul.needs .n{font-weight:800;color:var(--steven);grid-row:span 2}
 ul.needs em{font-style:normal;font-size:12.5px;color:var(--slag-2)}
+h2 .cnt{font-size:15px;font-weight:600;color:var(--slag-2);margin-left:6px}
+#archive summary{cursor:pointer;list-style:none}#archive summary::-webkit-details-marker{display:none}#archive summary h2{display:inline}#archive summary::after{content:" Show";font-size:14px;color:var(--slag-2)}#archive details[open] summary::after{content:" Hide"}
 table{width:100%;border-collapse:collapse;font-size:14px}
 th,td{text-align:left;padding:7px 10px 7px 0;border-bottom:1px solid #C3C9C5;vertical-align:top}
 th{font-size:13px;color:var(--slag-2);font-weight:600;border-bottom:2px solid var(--slag)}
-td.num{font-weight:700;width:40px}td.st{color:var(--slag-2);font-size:13px}
+td.num{font-weight:700;width:56px;white-space:nowrap}ul.needs .n a{color:inherit;text-decoration:none}td.ep{white-space:nowrap;color:var(--slag-2);font-size:13px}td.st{color:var(--slag-2);font-size:13px}
 .pill{display:inline-block;font-size:12px;padding:1px 8px;white-space:nowrap;color:#fff;background:var(--k)}
 .pill.done{--k:var(--done)}.pill.review{--k:#4C9A69}.pill.active{--k:var(--active)}.pill.ready{--k:var(--ready)}.pill.blocked{--k:#7E8A93}.pill.steven{--k:#A87208}.pill.parked{--k:#8D959A}
 .tablewrap{overflow-x:auto}
@@ -220,21 +242,24 @@ footer{margin:48px 0 40px;font-size:13px;color:var(--slag-2)}
 <header><div><h1>Engine development</h1><p class="caveat">Snapshot of the Kindling task queue in git. Claude Code's own status edits stay uncommitted on the PC, so rows it is working on can lag here.</p></div>
 <div class="meta">Built %BUILT%<br>Queue commit %COMMIT%</div></header>
 
-<nav class="pnav" aria-label="On this page"><ul><li><a href="#experiments">Experiments</a></li><li><a href="#needs">Needs Steven</a></li><li><a href="#build">Build order</a></li><li><a href="#standards">Standards</a></li><li><a href="#alltasks">All tasks</a></li><li><a href="#decisions">Decisions</a></li></ul></nav>
+<nav class="pnav" aria-label="On this page"><ul><li><a href="#experiments">Experiments</a></li><li><a href="#needs">Needs Steven</a></li><li><a href="#build">Build order</a></li><li><a href="#standards">Standards</a></li><li><a href="#alltasks">Open tasks</a></li><li><a href="#archive">Archive</a></li><li><a href="#decisions">Decisions</a></li></ul></nav>
 <div class="kpis"><div class="a"><b>%ACTIVE%</b><span>In progress</span></div><div><b>%READY%</b><span>Ready to start</span></div><div class="s"><b>%STEVEN%</b><span>Need Steven</span></div><div class="d"><b>%DONE%</b><span>Done (of %TOTAL% tasks)</span></div></div>
 <div class="bar" aria-hidden="true">%BAR%</div>
 
 <section id="experiments"><h2>AAA PBR experiments</h2><div class="exps">%EXP%</div></section>
 
 <div class="grid">
-<section style="margin-top:0" id="needs"><h2>Needs Steven</h2><ul class="needs">%NEEDS%</ul></section>
+<section style="margin-top:0" id="needs"><h2>Needs Steven <span class="cnt">%NNEEDS%</span></h2><ul class="needs">%NEEDS%</ul></section>
 <section style="margin-top:0" id="build"><h2>Engine build order</h2><ol class="steps">%STEPS%</ol></section>
 </div>
 
 <section id="standards"><h2>Standards</h2><div class="tablewrap"><table><thead><tr><th>#</th><th>Standard</th><th>Owner</th><th>State</th></tr></thead><tbody>%STD%</tbody></table></div></section>
 
-<section id="alltasks"><h2>All tasks</h2><div class="chips" role="group" aria-label="Filter by status">%LEGEND%</div>
-<div class="tablewrap" style="margin-top:12px"><table id="tasks"><thead><tr><th>#</th><th>Task</th><th>State</th><th>Status line</th></tr></thead><tbody>%ROWS%</tbody></table></div></section>
+<section id="alltasks"><h2>Open tasks <span class="cnt">%NOPEN%</span></h2><p class="caveat">In priority order: pipeline work first, automation after (Steven, 2026-11-25). Tasks waiting on Steven are in Needs Steven; done tasks are in the archive.</p><div class="chips" role="group" aria-label="Filter by status">%LEGEND%</div>
+<div class="tablewrap" style="margin-top:12px"><table id="tasks"><thead><tr><th>ID</th><th>Epic</th><th>Task</th><th>State</th><th>Status line</th></tr></thead><tbody>%ROWS%</tbody></table></div></section>
+
+<section id="archive"><details><summary><h2>Archive <span class="cnt">%NARCH% done</span></h2></summary>
+<div class="tablewrap" style="margin-top:12px"><table><thead><tr><th>ID</th><th>Epic</th><th>Task</th><th>State</th><th>Status line</th></tr></thead><tbody>%ARCHIVE%</tbody></table></div></details></section>
 
 <section id="decisions"><h2>Latest decisions</h2><ul class="dec">%DEC%</ul></section>
 <footer>Built by tools/build_dev_dashboard.py in KindlingDashboard from KindlingEngine handover/queue/kindling-task-queue.md and reports/.</footer>
