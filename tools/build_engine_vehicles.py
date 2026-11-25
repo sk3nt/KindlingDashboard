@@ -14,7 +14,7 @@ E = html.escape
 IMG = ROOT / "img" / "vehicles"
 DL = re.search(r"^DESIGN LANGUAGE \(paste into every vehicle prompt\): (.*)$", TXT, re.M).group(1)
 P = dict(re.findall(r"^(QB-[A-Z]+): (.*)$", TXT, re.M))
-NEXT = [(re.split(r"[:(]| for ", n, 1)[0].strip().removeprefix("A ").capitalize(), n.strip()) for n in re.findall(r"^- (A [^.(]+)", TXT.split("## Next vehicles", 1)[1].split("##", 1)[0], re.M)]
+NEXT = [(re.split(r"[:(]| for ", n, maxsplit=1)[0].strip().removeprefix("A ").capitalize(), n.strip()) for n in re.findall(r"^- (A [^.(]+)", TXT.split("## Next vehicles", 1)[1].split("##", 1)[0], re.M)]
 STEPS = [("CONCEPT", "Concept"), ("SHEET", "Sheet"), ("ACTION", "In action"), ("DETAILS", "Details")]
 
 
@@ -43,7 +43,7 @@ nexts = "".join(f'<div class="crow next"><h3>{E(n)} <small>Proposed</small></h3>
 SECTION = f'''<!--vehicles:start-->
 <section id="vehicles"><div class="wrap">
   <h2>Look development: vehicles</h2>
-  <p class="lede">Vehicles are built by the same makers as Tally, so they share her design language and run on Ora. The quad bike comes first. Prompts in the game repo, <code>Production/Design/prompts/vehicle-prompts.md</code>.</p>
+  <p class="lede">Vehicles are alien-built and supplied through the orbiting space station; only Tomas and Ines ride them (Steven, 2026-11-25). They share Tally's design language and run on Ora. The quad bike comes first. Prompts in the game repo, <code>Production/Design/prompts/vehicle-prompts.md</code>.</p>
   <h3 class="ch3">Design references: Tally</h3>
   <ol class="cstrip envref">{refs}</ol>
   <h3 class="ch3">Design language</h3>
@@ -53,7 +53,7 @@ SECTION = f'''<!--vehicles:start-->
   <div class="todo"><h3 class="ch3">Next to do</h3><ol class="nexts">
     <li><b>Generate the quad bike concept</b> with the Tally plate, the Tally poster and the village square attached.</li>
     <li><b>The sheet</b> once Steven approves the concept; Theo checks it for modelling, Daniel for scale in the lanes.</li>
-    <li><b>Steven and Nora decide the lore:</b> who built the vehicles, who may ride them, and how they charge.</li>
+    <li><b>Nora, for Steven:</b> are these the same aliens who made Tally, and how does a vehicle reach the ground from a station without power?</li>
     <li><b>Steven picks the next vehicle</b> from the proposals.</li>
   </ol></div>
 </div></section>
