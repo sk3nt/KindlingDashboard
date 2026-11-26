@@ -13,7 +13,9 @@
 body{margin:0;min-height:100vh;background:var(--ash);color:var(--slag);font:400 17px/1.5 "Archivo",system-ui,sans-serif;display:flex;flex-direction:column}
 .wrap{max-width:1320px;width:100%;margin:0 auto;padding:44px 28px}
 h1{font-variation-settings:"wdth" 125;font-weight:800;font-size:clamp(44px,6vw,72px);line-height:1;margin:0 0 36px}
-.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:22px}
+@media (max-width:1200px){.tiles{grid-template-columns:repeat(2,1fr)}}
+.spec{display:grid;grid-template-columns:repeat(4,1fr);height:100%}.spec i{display:block}
 @media (max-width:900px){.tiles{grid-template-columns:1fr}}
 a.tile{display:flex;flex-direction:column;text-decoration:none;color:inherit;background:var(--card);border:2px solid var(--slag);overflow:hidden}
 a.tile:hover h2,a.tile:focus-visible h2{text-decoration:underline;text-underline-offset:5px;text-decoration-thickness:2px}
@@ -44,6 +46,10 @@ a.game .txt p{color:#C9BCCF}
     <a class="tile game" href="discovery/index.html">
       <div class="pic"><img src="img/concept-tomas.webp" alt="Tomas holding a green-glowing lantern above the village at dawn" style="object-position:40% 30%"></div>
       <div class="txt"><h2>Kindling Discovery</h2><p>The game bible: world, Episode 01, characters, places and assets.</p></div>
+    </a>
+    <a class="tile" href="thought.html">
+      <div class="pic"><div class="spec" role="img" aria-label="Four colour bands, from code-first games to generated films"><i style="background:#3B6E8F"></i><i style="background:#22292E"></i><i style="background:#7A5C99"></i><i style="background:#D9622B"></i></div></div>
+      <div class="txt"><h2>Thought leadership</h2><p>Interactive entertainment: from vibe-coded games to generated films, and where we stand.</p></div>
     </a>
   </div>
 </main>

@@ -1,4 +1,4 @@
-/* Kindling site navigation: one bar across every space (Home, Engine, Development, Discovery).
+/* Kindling site navigation: one bar across every space (Home, Engine, Development, Discovery, Thought leadership).
  *
  * BEFORE PUBLISHING: set ENABLED to false, or delete this file. Pages work without it:
  * the bar disappears, the space offsets drop to zero, and cross-space links (elements with
@@ -14,7 +14,8 @@
     { id: "home", path: "index.html", label: "Kindling" },
     { id: "engine", path: "engine.html", label: "Engine" },
     { id: "dev", path: "dev-dashboard.html", label: "Development" },
-    { id: "discovery", path: "discovery/index.html", label: "Discovery" }
+    { id: "discovery", path: "discovery/index.html", label: "Discovery" },
+    { id: "thought", path: "thought.html", label: "Thought leadership" }
   ];
   var here = location.href.split("#")[0].split("?")[0];
   function isCurrent(s) {
