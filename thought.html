@@ -26,6 +26,7 @@ h1{font-variation-settings:"wdth" 125;font-weight:800;font-size:clamp(34px,5vw,5
 .col h3{font-size:13.5px;font-weight:700;margin:16px 0 4px;color:var(--k)}
 .col ul{margin:0;padding-left:18px;font-size:15px}
 .col li{margin:0 0 5px}
+.prod{margin-top:16px;border-top:2px solid var(--k);padding-top:4px}.prod ul{font-size:14.5px}
 .col .bet{margin-top:16px;background:#fff;padding:10px 12px;border-left:4px solid var(--k);font-size:15px}
 .col .bet b{display:block;font-size:13.5px;margin-bottom:2px}
 .k1{--k:var(--c1)}.k2{--k:var(--c2)}.k3{--k:var(--c3)}.k4{--k:var(--c4)}
@@ -60,6 +61,7 @@ a:focus-visible{outline:3px solid var(--ember);outline-offset:2px}
       <ul><li>Content scale: art, animation and levels still need a pipeline.</li><li>Long-lived code nobody understands.</li><li>Console, mobile store and live-ops requirements.</li></ul>
       <h3>State of the art, 2026</h3>
       <ul><li>A widely read developer called October 2026 an inflection point: current models build fun browser games with little guidance.</li><li>Browser game jams and prompt-to-game platforms now count creators in the tens of thousands.</li></ul>
+      <div class="prod"><h3>Available now</h3><ul><li><b>Rosebud AI</b> browser prompt-to-game platform; about 70,000 creators and over a million games.</li><li><b>Nilo</b> browser 3D game creation in open beta, on its own WebGPU engine.</li><li><b>VibeGame</b> open-source declarative engine on three.js, built for AI-assisted game making.</li><li><b>Coding agents plus three.js</b> the route behind most viral vibe-coded games.</li></ul><h3>To watch</h3><ul><li><b>Browser game jams</b> with prizes and no-download rules, the proving ground for the format.</li><li><b>Multiplayer</b> vibe-coded relay servers now give small browser games 2 to 4 players.</li></ul></div>
       <div class="bet"><b>Kindling's use</b>Prototype a mechanic in an evening before it costs the Unity pipeline anything.</div>
     </section>
 
@@ -72,6 +74,7 @@ a:focus-visible{outline:3px solid var(--ember);outline-offset:2px}
       <ul><li>Asset cost: AAA characters, worlds and animation are still the bottleneck.</li><li>Pipeline glue between tools, where most failures happen.</li><li>The look is only as good as the art that goes in.</li></ul>
       <h3>State of the art, 2026</h3>
       <ul><li>Agents can now drive the editor and batch builds; the frontier is the asset pipeline, not the code.</li><li>Concept to production sheet to mesh to rig is partly automated; animation and world-building are the open problems.</li></ul>
+      <div class="prod"><h3>Available now</h3><ul><li><b>Unity AI (open beta)</b> in-editor Assistant with Ask, Plan and Agent modes; an official MCP server so outside agents drive the editor; an AI Gateway for your own models; Generators for placeholder assets.</li><li><b>Blender MCP</b> Blender driven by agents; our greybox and animation route.</li></ul><h3>To watch</h3><ul><li><b>Unity Generators beyond placeholders</b> today they make dev-stage assets tagged as AI-generated, to be replaced before shipping.</li><li><b>Production-quality image-to-3D</b> our E2 bake-off decides what is usable for hero meshes.</li></ul></div>
       <div class="bet"><b>Kindling's bet</b>This is the column we build in: Unity 6, rules, judges and a nightly build Steven scores for Fun and Look.</div>
     </section>
 
@@ -84,6 +87,7 @@ a:focus-visible{outline:3px solid var(--ember);outline-offset:2px}
       <ul><li>Frame-to-frame flicker and drift over long play.</li><li>Speed: high quality is still far from real time on consumer hardware.</li><li>Small details players need to read (ledges, items) can be restyled away.</li></ul>
       <h3>State of the art, 2026</h3>
       <ul><li><b>Anorak</b> (London and Chengdu, founded by the team behind Hutch) is the company to watch: its medium is interactive generative video, video that reacts to the player in real time, built on its own inference technology to make it faster and cheaper. It raised $5M in November 2026 with Supercell and MTG in the round, and plans playable formats and a creator platform for early 2027.</li><li>Research now enhances engine frames towards photoreal in real time by distilling a heavy offline model into a light one.</li><li>Style transfer that reads the engine's depth and buffers is markedly steadier than plain video stylisation.</li><li>Fully generated, playable world models stream minutes of interactive 720p video from a prompt.</li></ul>
+      <div class="prod"><h3>Available now</h3><ul><li><b>Odyssey-2 Pro</b> world model API streaming interactive 720p video at about 22 fps.</li><li><b>World Labs Marble</b> image, video or text to a navigable 3D world in minutes, by API.</li><li><b>Decart Mirage and Lucy</b> real-time video-to-video: restyles a live feed or a game as it plays.</li><li><b>Project Genie (Google)</b> Genie 3 worlds for Google AI Ultra subscribers in the US; 60-second sessions at 720p.</li></ul><h3>To watch</h3><ul><li><b>Anorak</b> playable generative video formats and a creator platform planned for early 2027.</li><li><b>Decart Oasis 3</b> hours-long real-time world model, by API; built for physical AI, a sign of where games go.</li><li><b>In-engine style transfer research</b> real-time photoreal enhancement and depth-aware style transfer for engine frames.</li></ul></div>
       <div class="bet"><b>Kindling's use</b>Previs and look tests: greybox from Blender, restyled to the film frames, judged before any art is built. Where Anorak generates the whole picture, we keep the geometry and rules in the engine and generate only the look.</div>
     </section>
 
@@ -96,6 +100,7 @@ a:focus-visible{outline:3px solid var(--ember);outline-offset:2px}
       <ul><li>Consistency of faces, props and places across shots.</li><li>Audience scepticism: obvious AI artefacts draw ridicule.</li><li>Rights and credits for every reference that goes in.</li></ul>
       <h3>State of the art, 2026</h3>
       <ul><li>The working method is asset-first: lock characters and places once, script shot by shot, then generate each shot from the references.</li><li>Full-length generated features exist; critics still find them unconvincing.</li></ul>
+      <div class="prod"><h3>Available now</h3><ul><li><b>Google Veo 3.1</b> strongest for cinematic shots with generated sound.</li><li><b>Kling 3.0</b> connected cinematic shots, strong value.</li><li><b>Runway Gen-4.5 and Aleph</b> shot control and editing for professionals.</li><li><b>Seedance 2.0 and 2.5</b> reference-driven: images, motion and audio as inputs, multi-shot storyboards.</li></ul><h3>To watch</h3><ul><li><b>Sora</b> retired: OpenAI shut its API on 24 September 2026, a reminder to keep a second model on every pipeline.</li><li><b>Open models (Wan)</b> self-hosted video generation at zero licence cost, for a local GPU.</li><li><b>Challengers</b> new entrants such as Alibaba's HappyHorse-1.0.</li></ul></div>
       <div class="bet"><b>Kindling's use</b>The trailer keyframe work and E9: live-action stills and clips from our canon, then back into the game as motion.</div>
     </section>
   </div>
@@ -119,6 +124,17 @@ a:focus-visible{outline:3px solid var(--ember);outline-offset:2px}
       <li><a href="https://tech.eu/2026/11/11/anorak-secures-5m-to-let-anyone-create-their-own-ai-powered-games/" target="_blank" rel="noopener">Tech.eu: Anorak secures $5M (November 2026)</a></li>
       <li><a href="https://mobilegamer.biz/generative-video-startup-anorak-raises-5m-from-supercell-play-ventures-and-more/" target="_blank" rel="noopener">Mobilegamer.biz: Anorak raises $5M from Supercell, Play Ventures and more</a></li>
       <li><a href="https://runtimewire.com/article/anorak-hutch-founders-5m-playable-generative-video" target="_blank" rel="noopener">Runtime Wire: playable formats and creator platform planned for early 2027</a></li>
+      <li><a href="https://unity.com/en/blog/unity-ai-how-to-get-started" target="_blank" rel="noopener">Unity: AI tools in beta, how to get started</a></li>
+      <li><a href="https://unity.com/en/resources/what-is-unity-ai" target="_blank" rel="noopener">Unity: what are Unity's AI tools</a></li>
+      <li><a href="https://nilo.io/articles/free-ai-vibe-coded-games" target="_blank" rel="noopener">Nilo: free AI vibe-coded games (August 2026)</a></li>
+      <li><a href="https://huggingface.co/blog/vibegame" target="_blank" rel="noopener">Hugging Face: VibeGame</a></li>
+      <li><a href="https://www.calcalistech.com/ctechnews/article/bjakbtuiee" target="_blank" rel="noopener">Calcalist: Decart launches Mirage, real-time video-to-video</a></li>
+      <li><a href="https://techcrunch.com/2026/06/10/decarts-new-world-model-can-simulate-hours-of-photorealistic-driving-with-some-caveats/" target="_blank" rel="noopener">TechCrunch: Decart Oasis 3 (June 2026)</a></li>
+      <li><a href="https://thenextweb.com/news/decart-300-million-radical-ventures-world-models" target="_blank" rel="noopener">The Next Web: Decart raises $300M; Lucy under 30 ms</a></li>
+      <li><a href="https://blog.google/innovation-and-ai/models-and-research/google-deepmind/project-genie/" target="_blank" rel="noopener">Google: Project Genie (January 2026)</a></li>
+      <li><a href="https://9to5google.com/2026/01/29/google-project-genie/" target="_blank" rel="noopener">9to5Google: Project Genie sessions and resolution</a></li>
+      <li><a href="https://dreamina.capcut.com/ai-video/best-ai-video-generators-2026-Runway-Sora-Veo-Kling" target="_blank" rel="noopener">Dreamina: best AI video generators (September 2026)</a></li>
+      <li><a href="https://dev.to/tekmag/veo-31-vs-runway-gen-45-vs-kling-30-best-ai-video-generator-compared-2026-14bl" target="_blank" rel="noopener">Veo 3.1 vs Runway Gen-4.5 vs Kling 3.0 (2026)</a></li>
       <li><a href="https://deepmind.google/blog/genie-3-a-new-frontier-for-world-models/" target="_blank" rel="noopener">Google DeepMind: Genie 3 world model</a></li>
       <li><a href="https://www.eweek.com/news/interactive-world-model-apis-neuron/" target="_blank" rel="noopener">eWeek: Odyssey-2 Pro and World Labs APIs (January 2026)</a></li>
       <li><a href="https://higgsfield.ai/es/blog/make-game-trailer-with-ai" target="_blank" rel="noopener">Higgsfield: making a game trailer with AI, asset-first</a></li>
