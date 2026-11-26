@@ -24,7 +24,7 @@ def common(name):
 
 
 STYLE = common("STYLE REFS")
-COMMONS = [("Location plate", common("COMMON PLATE")), ("Isolated structure sheet", common("COMMON STRUCTURE SHEET")), ("Prop sheet (S7)", common("COMMON PROP SHEET"))]
+COMMONS = [("Location plate", common("COMMON PLATE"))]
 items = []
 for m in re.finditer(r"^((?:V|C)\d|S-[VC]\d+|P\d+)( \([^)]*\))?: (.*)$|^((?:S-[VC]\d+|P\d+)) ([^:]+): (.*)$", TXT, re.M):
     if m.group(1):
@@ -88,8 +88,8 @@ SECTION = f'''<!--environment:start-->
   <h3 class="ch3">Style reference: the film frames</h3>
   <p class="o">Village prompts attach the empty village square plate; castle prompts attach the castle stairs frame. Each prompt asks to match their photographic look, light, grade and materials, and to use them only for look: no people.</p>
   <ol class="cstrip envref">{refs}</ol>
-  <h3 class="ch3">Common prompts</h3>
-  <p class="o">Each prompt below starts from one of these. The full set is in <code>Production/Design/prompts/environment-prompts.md</code> in the game repo.</p>
+  <h3 class="ch3">Common prompt</h3>
+  <p class="o">Each location prompt starts from this. The full set is in <code>Production/Design/prompts/environment-prompts.md</code> in the game repo.</p>
   <ol class="cprompts">{commons}</ol>
   <h3 class="ch3">Real-world references</h3>
   <p class="o">Places that look like ours, used for ideas only. Prompts describe the feature and never name the place, so the generator does not copy a real landmark.</p>
@@ -100,16 +100,15 @@ SECTION = f'''<!--environment:start-->
   <ol class="cstrip envgrid" style="margin-top:12px">{"".join(f'<li class="cc"><div class="cl">{E(k.replace("MAP-", "").replace("-", " ").title())}</div>{image(k.lower(), k)}<details class="pr"><summary><span class="snip">{E(snip(t))}</span><span class="more">Full prompt</span></summary><pre>{E(t)}</pre></details></li>' for k, t in WMAP)}</ol></div>
   <div class="crow"><h3>Village: key locations</h3><ol class="cstrip envgrid">{group(r"V\d")}</ol></div>
   <div class="crow"><h3>Castle: key locations</h3><ol class="cstrip envgrid">{group(r"C\d")}</ol></div>
-  <div class="crow"><h3>Isolated key structures</h3><p class="o">Grid modules (house walls, stairs, roofs, terraces) become procedural kits later; their sheets are the look reference. Landmarks can be meshed from the sheet.</p><ol class="cstrip envgrid">{group(r"S-")}</ol></div>
-  <div class="crow"><h3>Props</h3><p class="o">Props marked E4 are the first five to build. No stock game props: no barrels, crates, sacks or chests.</p><ol class="cstrip envgrid">{group(r"P\d")}</ol></div>
+  <p class="o" style="margin-top:28px">Key structures and props have their own sections below: <a href="#structures">key structures</a>, <a href="#props">props</a>.</p>
   <div class="todo"><h3 class="ch3">Next to do</h3><ol class="nexts">
     <li><b>Clean plates</b> for the frames that have a character in them: V2, V3, C1, C2, C3 (same camera, character removed).</li>
     <li><b>The world map:</b> generate the photoreal map first, then the illustrated one from it; Leo checks the layout against the Episode 01 sketch.</li>
     <li><b>V0, the village establishing shot,</b> from the layout of record, with the square plate attached for the look.</li>
     <li><b>Village plates V4 to V7,</b> then castle plates C0, C4 and C5.</li>
-    <li><b>Structure sheets,</b> landmarks first: S-V4 market stall, the bridge (S-V5 or S-V10), S-C1 gatehouse, S-C4 keep, S-C6 gate tunnel.</li>
+    <li><b>Structure sheets,</b> from the reference crops first: market stall, gatehouse, round tower, curtain wall, stair flight, two house types.</li>
     <li><b>Steven decides</b> whether the timber footbridge becomes a fortified stone bridge with a gate tower (S-V10).</li>
-    <li><b>Prop sheets for the five E4 props</b> (P3, P4, P5, P8, P12), then the rest.</li>
+    <li><b>Prop sheets for the five E4 props</b> (P3, P4, P5, P8, P12): the lantern bracket has a crop; the other four need a reference first.</li>
     <li><b>Steven approves</b> the 9 locations and caps in the props list (still a draft).</li>
   </ol></div>
 </div></section>
