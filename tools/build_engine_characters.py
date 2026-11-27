@@ -14,7 +14,7 @@ ROOT = Path(__file__).resolve().parent.parent
 GAME = Path(sys.argv[1] if len(sys.argv) > 1 else os.environ.get("KINDLING_GAME", ROOT.parent / "KindlingDiscovery"))
 PR = GAME / "Production" / "Design" / "prompts"
 
-STEPS = [("concept", "Concept"), ("plate", "Plate"), ("intro", "Photoreal intro"), ("poster", "Poster"), ("closeup", "4K close-up")]
+STEPS = [("concept", "Concept"), ("plate", "Plate"), ("intro", "Photoreal intro"), ("turntable", "Turntable (PBR)"), ("clay", "Turntable (clay)"), ("poster", "Poster"), ("closeup", "4K close-up")]
 CHARS = [("tomas", "Tomas", "The hero"), ("ines", "Ines", "His twin sister"), ("king", "The King", "Episode 1 boss"), ("tally", "Tally", "The Charge-walker companion")]
 NOTE = {
     ("ines", "concept"): "Prompt not recorded in the repo.",
@@ -53,6 +53,9 @@ def cline(prefix):
 intro = read("character-intro-prompts.md")
 poster = read("live-action-poster-prompts.md")
 hero = read("hero-plate-prompt-pack.md")
+turn = read("turntable-prompts.md")
+TURN = line(turn, "TURNTABLE:")
+CLAY = line(turn, "CLAY (attach the chosen PBR turntable; edit, not a new image):")
 
 TAIL = line(plates, "TAIL:")
 APOSE = line(plates, "APOSE:")
@@ -74,6 +77,8 @@ COMMON = {
     "plate": "APOSE: " + APOSE + "\n\nTAIL: " + TAIL,
     "intro": FRAME,
     "poster": poster_open + " [character and scene] " + poster_close,
+    "turntable": "Attach the plate, the photoreal intro and the 4K close-up. " + TURN,
+    "clay": "Edit of the chosen PBR turntable. " + CLAY,
     "closeup": "Using the [character] in the reference image, create a tight, full-frame close-up of the head and shoulders, shot like a live-action feature film still. [Same character: face, hair, costume.] Calm, focused expression, eyes locked on the camera, eyes in the upper third, sharp with clear catchlights. Real skin: pores, freckles, natural uneven tone. Low golden sun as a warm rim light, soft cool fill. Background softly out of focus. Large-format cinema lens, shallow depth of field, fine film grain, true-to-life colour, no beauty retouching look. (Ines and the King also attach the Tomas close-up as a second reference: same look, framing, lens, lighting and grade.) The 4K file is then a local upscale, with no prompt.",
 }
 
@@ -107,6 +112,10 @@ for ch, key in (("tomas", "HERO"), ("ines", "INES"), ("king", "KING"), ("tally",
     ct = ct.split("): ", 1)[1] if "): " in ct.split(":")[0] + "):" and ct.startswith(ck + " (") else ct.split(":", 1)[1]
     ct = ct.strip()
     P[(ch, "closeup")] = (ct, ct)
+    tk = {"tomas": "TOMAS", "ines": "INES", "king": "KING", "tally": "TALLY"}[ch]
+    tx = next(ln for ln in turn.splitlines() if ln.startswith("- " + tk + ":")).split(":", 1)[1].strip()
+    P[(ch, "turntable")] = ("TURNTABLE: " + TURN + "\n\n" + tk + ": " + tx, tx)
+    P[(ch, "clay")] = (CLAY, CLAY)
     ptxt = line(clean, nk + ":")
     P[(ch, "poster")] = (ptxt, ptxt)
 
@@ -152,7 +161,7 @@ common_html = "".join(
 SECTION = f'''<!--characters:start-->
 <section id="characters"><div class="wrap">
   <h2>Look development: characters</h2>
-  <p class="lede">Every character goes through five steps: concept, plate, photoreal intro, poster and 4K close-up. Click an image to open it full size in a new window. Click "Full prompt" under it to read the prompt.</p>
+  <p class="lede">Every character goes through seven steps: concept, plate, photoreal intro, a PBR turntable and its clay render (the input for 3D mesh generation, new and experimental), poster and 4K close-up. Click an image to open it full size in a new window. Click "Full prompt" under it to read the prompt.</p>
   <h3 class="ch3">Common prompts</h3>
   <p class="o">Each step starts from one shared prompt. A character adds only its own description.</p>
   <ol class="cprompts">{common_html}</ol>
@@ -180,9 +189,9 @@ ol.cprompts{list-style:none;margin:10px 0 0;padding:0;border:0;display:grid;gap:
 .pr pre{white-space:pre-wrap;word-break:break-word;font:12.5px/1.5 ui-monospace,Consolas,monospace;background:#fff;border:1px solid var(--ash-2);padding:10px;margin:8px 0 0;max-height:340px;overflow:auto}
 .cp{background:#EEF0EE;padding:10px 14px;border-left:6px solid var(--ember)}.cp summary b{display:block;font-size:15px;margin-bottom:2px}
 .crow{margin-top:34px}.crow h3{font-size:22px;margin:0 0 10px}.crow h3 small{font-weight:400;font-size:14px;color:var(--slag-2);margin-left:8px}
-ol.cstrip{list-style:none;margin:0;padding:0;border:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;align-items:start}
+ol.cstrip{list-style:none;margin:0;padding:0;border:0;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:12px;align-items:start}
 .cc{background:#EEF0EE;padding:8px 8px 10px}.cl{font-size:13px;font-weight:700;margin-bottom:6px}
-.im{display:flex;align-items:center;justify-content:center;height:190px;background:var(--ash-2);overflow:hidden}
+.im{display:flex;align-items:center;justify-content:center;height:170px;background:var(--ash-2);overflow:hidden}
 a.im{cursor:zoom-in}a.im:focus-visible{outline:3px solid var(--ember)}
 .im img{max-width:100%;max-height:100%;object-fit:contain;display:block}
 .im.gen{background:repeating-linear-gradient(45deg,#E3E6E3 0 10px,#D5D9D5 10px 20px);border:2px dashed #9AA5AD}
@@ -195,6 +204,7 @@ a.im{cursor:zoom-in}a.im:focus-visible{outline:3px solid var(--ember)}
 .rp pre{white-space:pre-wrap;word-break:break-word;font:13px/1.55 ui-monospace,Consolas,monospace;margin:0;max-height:420px;overflow:auto}
 .js .cc .pr pre{display:none}
 .cc .pr[open]{outline:2px solid var(--ember);outline-offset:3px}
+@media (max-width:1300px){ol.cstrip{grid-template-columns:repeat(4,minmax(0,1fr))}}
 @media (max-width:900px){ol.cstrip{grid-template-columns:repeat(2,minmax(0,1fr))}}
 /*characters:end*/'''
 
