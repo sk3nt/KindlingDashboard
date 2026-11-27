@@ -37,7 +37,7 @@ for m in re.finditer(r"^((?:V|C)\d|S-[VC]\d+|P\d+)( \([^)]*\))?: (.*)$|^((?:S-[V
 
 NAMES = {"V0": "Village establishing", "V1": "Village square", "V2": "Narrow alley", "V3": "Village steps", "V4": "Harbour lane",
          "V5": "Back lanes", "V6": "Rooftop routes", "V7": "Bridge and river", "C0": "Castle establishing", "C1": "Castle stairs",
-         "C2": "Castle gate and ramparts", "C3": "Castle terrace, view south", "C4": "Castle courtyard", "C5": "The Mayor's hall"}
+         "C2": "Castle gate and ramparts", "C3": "Castle terrace, view south", "C4": "Castle courtyard", "C5": "The King's hall"}
 HAVE = {"v0": "Layout of record (painted canon art); the photoreal plate is next.",
         "v1": "Film frame, empty plate. Style reference for every village prompt.",
         "v2": "Film frame with Tomas; the clean plate is next.",

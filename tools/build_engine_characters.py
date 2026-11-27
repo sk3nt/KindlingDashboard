@@ -15,7 +15,7 @@ GAME = Path(sys.argv[1] if len(sys.argv) > 1 else os.environ.get("KINDLING_GAME"
 PR = GAME / "Production" / "Design" / "prompts"
 
 STEPS = [("concept", "Concept"), ("plate", "Plate"), ("intro", "Photoreal intro"), ("poster", "Poster"), ("closeup", "4K close-up")]
-CHARS = [("tomas", "Tomas", "The hero"), ("ines", "Ines", "His twin sister"), ("mayor", "The Mayor", "Episode 1 boss"), ("tally", "Tally", "The Charge-walker companion")]
+CHARS = [("tomas", "Tomas", "The hero"), ("ines", "Ines", "His twin sister"), ("king", "The King", "Episode 1 boss"), ("tally", "Tally", "The Charge-walker companion")]
 NOTE = {
     ("ines", "concept"): "Prompt not recorded in the repo.",
 }
@@ -62,7 +62,7 @@ FRAME = line(intro, "COMMON FRAME:")
 a2 = line(hero, "A2:")
 concept_common = ("Cinematic portrait, original character concept art, painterly, in the style of the canon style master (ConceptTomas). "
                   + re.search(r"(Large-format cinema camera look.*)$", a2).group(1)
-                  + " Rule: Ora light is green (lantern, Tally, the Mayor's gadget); ordinary fire and village window light stay amber.")
+                  + " Rule: Ora light is green (lantern, Tally, the King's gadget); ordinary fire and village window light stay amber.")
 tomas_clean = line(poster, "TOMAS:") if False else None
 clean = poster[poster.index("## REALISM-FIRST CLEAN SET"):]
 tomas_poster = line(clean, "TOMAS:")
@@ -74,7 +74,7 @@ COMMON = {
     "plate": "APOSE: " + APOSE + "\n\nTAIL: " + TAIL,
     "intro": FRAME,
     "poster": poster_open + " [character and scene] " + poster_close,
-    "closeup": "Using the [character] in the reference image, create a tight, full-frame close-up of the head and shoulders, shot like a live-action feature film still. [Same character: face, hair, costume.] Calm, focused expression, eyes locked on the camera, eyes in the upper third, sharp with clear catchlights. Real skin: pores, freckles, natural uneven tone. Low golden sun as a warm rim light, soft cool fill. Background softly out of focus. Large-format cinema lens, shallow depth of field, fine film grain, true-to-life colour, no beauty retouching look. (Ines and the Mayor also attach the Tomas close-up as a second reference: same look, framing, lens, lighting and grade.) The 4K file is then a local upscale, with no prompt.",
+    "closeup": "Using the [character] in the reference image, create a tight, full-frame close-up of the head and shoulders, shot like a live-action feature film still. [Same character: face, hair, costume.] Calm, focused expression, eyes locked on the camera, eyes in the upper third, sharp with clear catchlights. Real skin: pores, freckles, natural uneven tone. Low golden sun as a warm rim light, soft cool fill. Background softly out of focus. Large-format cinema lens, shallow depth of field, fine film grain, true-to-life colour, no beauty retouching look. (Ines and the King also attach the Tomas close-up as a second reference: same look, framing, lens, lighting and grade.) The 4K file is then a local upscale, with no prompt.",
 }
 
 # --- per character --------------------------------------------------------------------
@@ -91,18 +91,18 @@ def p_intro(key):
 P = {}
 lines_tomas_edit = edit_block(section(hero, "## Hero key art: lantern turns green"))
 P[("tomas", "concept")] = (a2 + "\n\nThen, edit round: " + lines_tomas_edit, a2)
-m11 = edit_block(section(hero, "## Mayor round 11"))
-P[("mayor", "concept")] = ("(Final of eleven rounds; base is the previous round's image.)\n" + m11, m11)
+m11 = edit_block(section(hero, "## King round 11"))
+P[("king", "concept")] = ("(Final of eleven rounds; base is the previous round's image.)\n" + m11, m11)
 t5 = edit_block(section(hero, "## Tally round 5, simplified"))
 P[("tally", "concept")] = (t5 + "\n(The canon image has no ears.)", t5)
-for ch, key in (("tomas", "HERO"), ("ines", "INES"), ("mayor", "MAYOR"), ("tally", "TALLY")):
-    nk = {"tomas": "TOMAS", "ines": "INES", "mayor": "THE MAYOR", "tally": "TALLY"}[ch]
+for ch, key in (("tomas", "HERO"), ("ines", "INES"), ("king", "KING"), ("tally", "TALLY")):
+    nk = {"tomas": "TOMAS", "ines": "INES", "king": "THE KING", "tally": "TALLY"}[ch]
     P[(ch, "plate")] = p_plate(key)
     if ch != "tomas":
         base = p_plate("HERO")[0]
         P[(ch, "plate")] = ("Base sheet prompt (written for Tomas):\n" + base + "\n\nAdapt it for this character:\n" + P[(ch, "plate")][0], P[(ch, "plate")][1])
     P[(ch, "intro")] = p_intro(nk)
-    ck = {"tomas": "TOMAS", "ines": "INES", "mayor": "MAYOR", "tally": "TALLY"}[ch]
+    ck = {"tomas": "TOMAS", "ines": "INES", "king": "KING", "tally": "TALLY"}[ch]
     ct = next(ln for ln in closeup.splitlines() if ln.startswith(ck + " ") or ln.startswith(ck + ":"))
     ct = ct.split("): ", 1)[1] if "): " in ct.split(":")[0] + "):" and ct.startswith(ck + " (") else ct.split(":", 1)[1]
     ct = ct.strip()

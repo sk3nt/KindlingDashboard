@@ -17,7 +17,7 @@ GROUPS = [
     ("Accents: textiles and flowers", "Small, saturated, and few. In the square they cover about 8 percent of the frame.", [
         ("Cloth teal", "#0F4B52"), ("Cloth orange", "#AF571A"), ("Cloth magenta", "#8E1449"), ("Cloth mustard", "#BE8610"),
         ("Cloth blue", "#204E77"), ("Banner red", "#9A2329"), ("Bougainvillea", "#541C2D"), ("Paper lantern", "#B88E67")]),
-    ("Ora: the one magic colour", "Only for Ora light: Tomas's lantern, Tally's core and LED, the Mayor's gem. Measured from the canon lantern plate.", [
+    ("Ora: the one magic colour", "Only for Ora light: Tomas's lantern, Tally's core and LED, the King's gem. Measured from the canon lantern plate.", [
         ("Ora green", "#7EE41E")]),
 ]
 RULES = [
@@ -27,7 +27,7 @@ RULES = [
     ("Ora green", "Green light means Ora and nothing else. No green lamps, no green sky, no green glow on distant walls."),
     ("Per location", "Each location keeps its own accent colour pair and signature props (props list). The same textile hue is never the main accent in two neighbouring locations."),
     ("Materials", "Honey limestone, lime plaster, terracotta roofs and pots, weathered timber, worn stone steps and cobbles. Clean and lived-in, never grimy."),
-    ("Characters", "Costumes read against the stone: Tomas in teal stripes, Ines in cream, the Mayor in red, orange and gold patchwork, Tally in olive and orange."),
+    ("Characters", "Costumes read against the stone: Tomas in teal stripes, Ines in cream, the King in red, orange and gold patchwork, Tally in olive and orange."),
 ]
 import os, sys
 GAME = Path(sys.argv[1] if len(sys.argv) > 1 else os.environ.get("KINDLING_GAME", ROOT.parent / "KindlingDiscovery"))
@@ -52,7 +52,7 @@ KEYS = [
     ("Dusk", "Deeper orange sun, long shadows, windows and lanterns turn on in amber.", "To write"),
     ("Night", "Stone drops to blue grey, accents almost vanish; amber windows and Ora green carry the frame.", "To write"),
     ("Weather: overcast and rain", "Soft light, wet dark stone with reflections, accents become the brightest thing.", "To write"),
-    ("Castle", "Cooler grey stone, the Mayor's red and gold only, harder shadows, wider sky.", "To write"),
+    ("Castle", "Cooler grey stone, the King's red and gold only, harder shadows, wider sky.", "To write"),
     ("Beach and tide pools", "Pale sand, sea teal, Ora glow in the pools at dawn.", "To write"),
     ("Woodland areas 1 to 5", "One key each, so the five feel different: light through canopy, own accent.", "To write"),
     ("Village struggling, then thriving", "Story state: at first, faded cloth, empty stalls, few lit windows. As the village thrives and farms Ora: fresh colour, busy stalls, more light.", "To write"),
