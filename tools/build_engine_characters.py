@@ -54,7 +54,7 @@ intro = read("character-intro-prompts.md")
 poster = read("live-action-poster-prompts.md")
 hero = read("hero-plate-prompt-pack.md")
 turn = read("turntable-prompts.md")
-TURN = line(turn, "TURNTABLE:")
+TURN = line(turn, "TURNTABLE v2 (Steven, 2026-11-27, after the King v1 in Nano Banana: \"four images are enough, arms should be spread out a bit more, fingers further apart, mouth more open\"; Nano Banana is the generator):")
 CLAY = line(turn, "CLAY (attach the chosen PBR turntable; edit, not a new image):")
 
 TAIL = line(plates, "TAIL:")
