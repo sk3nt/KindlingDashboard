@@ -27,7 +27,7 @@ RULES = [
     ("Ora green", "Green light means Ora and nothing else. No green lamps, no green sky, no green glow on distant walls."),
     ("Per location", "Each location keeps its own accent colour pair and signature props (props list). The same textile hue is never the main accent in two neighbouring locations."),
     ("Materials", "Honey limestone, lime plaster, terracotta roofs and pots, weathered timber, worn stone steps and cobbles. Clean and lived-in, never grimy."),
-    ("Characters", "Costumes read against the stone: Tomas in teal stripes, Ines in cream, the King in red, orange and gold patchwork, Tally in olive and orange."),
+    ("Characters", "Costumes read against the stone: Tomas in teal stripes, Ines in cream, the King in the royal colours: red, orange, gold, blue and teal patchwork, Tally in olive and orange."),
 ]
 import os, sys
 GAME = Path(sys.argv[1] if len(sys.argv) > 1 else os.environ.get("KINDLING_GAME", ROOT.parent / "KindlingDiscovery"))
@@ -52,7 +52,7 @@ KEYS = [
     ("Dusk", "Deeper orange sun, long shadows, windows and lanterns turn on in amber.", "To write"),
     ("Night", "Stone drops to blue grey, accents almost vanish; amber windows and Ora green carry the frame.", "To write"),
     ("Weather: overcast and rain", "Soft light, wet dark stone with reflections, accents become the brightest thing.", "To write"),
-    ("Castle", "Cooler grey stone, the King's red and gold only, harder shadows, wider sky.", "To write"),
+    ("Castle", "Cooler grey stone, the royal red, orange, gold, blue and teal only, harder shadows, wider sky.", "To write"),
     ("Beach and tide pools", "Pale sand, sea teal, Ora glow in the pools at dawn.", "To write"),
     ("Woodland areas 1 to 5", "One key each, so the five feel different: light through canopy, own accent.", "To write"),
     ("Village struggling, then thriving", "Story state: at first, faded cloth, empty stalls, few lit windows. As the village thrives and farms Ora: fresh colour, busy stalls, more light.", "To write"),
