@@ -14,9 +14,10 @@ E = html.escape
 IMG = ROOT / "img" / "vehicles"
 FS = "in a woodland clearing south of the river, the village terraces and the castle cliff far behind"
 DL = next(l for l in TXT.splitlines() if l.startswith("DESIGN LANGUAGE (paste into every vehicle prompt")).split("): ", 1)[1]
-P = dict(re.findall(r"^((?:QB|SB|CW|BT|GL)-[A-Z]+)(?: \([^)]*\))?: (.*)$", TXT, re.M))
-VEH = [("QB", "quad", "The skimmer", "First craft; zone 1"), ("SB", "scout", "The dart", "Fast, for the woodland paths; zone 2"),
-       ("CW", "walker", "The drifter", "Carries loads, follows on foot; zone 3"), ("BT", "boat", "The reed", "Over water and land; zone 4"), ("GL", "glider", "The wing", "From the sea cliffs; zone 5")]
+P = {}
+for _k, _v in re.findall(r"^((?:QB|SB|CW|BT|GL)-[A-Z]+)(?: \([^)]*\))?: (.*)$", TXT, re.M):
+    P.setdefault(_k, _v)
+VEH = [("CW", "walker", "Ribbon craft", "The Hollow: desert mesa and crater"), ("QB", "quad", "Crystal craft", "The Deepwood: east forest"), ("GL", "glider", "Ring craft", "The Lampwrights: sea cliffs and coves"), ("SB", "scout", "Flower craft", "The crown: parked at the castle gate"), ("BT", "boat", "Stone-shard craft", "The Snowline: mountains and pass")]
 STEPS = [("CONCEPT", "Concept"), ("SHEET", "Sheet"), ("ACTION", "In action"), ("DETAILS", "Details")]
 
 
