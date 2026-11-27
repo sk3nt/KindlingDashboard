@@ -54,7 +54,7 @@ intro = read("character-intro-prompts.md")
 poster = read("live-action-poster-prompts.md")
 hero = read("hero-plate-prompt-pack.md")
 turn = read("turntable-prompts.md")
-TURN = line(turn, "TURNTABLE v2 (Steven, 2026-11-27, after the King v1 in Nano Banana: \"four images are enough, arms should be spread out a bit more, fingers further apart, mouth more open\"; Nano Banana is the generator):")
+TURN = line(turn, "TURNTABLE v4 (standard; Steven approved the King result 2026-11-27, \"good\"; inputs: poster, then 4K close-up; Nano Banana):")
 CLAY = line(turn, "CLAY (attach the chosen PBR turntable; edit, not a new image):")
 
 TAIL = line(plates, "TAIL:")
@@ -77,7 +77,7 @@ COMMON = {
     "plate": "APOSE: " + APOSE + "\n\nTAIL: " + TAIL,
     "intro": FRAME,
     "poster": poster_open + " [character and scene] " + poster_close,
-    "turntable": "Attach the plate, the photoreal intro and the 4K close-up. " + TURN,
+    "turntable": "Attach the poster (body) and the 4K close-up (face). " + TURN,
     "clay": "Edit of the chosen PBR turntable. " + CLAY,
     "closeup": "Using the [character] in the reference image, create a tight, full-frame close-up of the head and shoulders, shot like a live-action feature film still. [Same character: face, hair, costume.] Calm, focused expression, eyes locked on the camera, eyes in the upper third, sharp with clear catchlights. Real skin: pores, freckles, natural uneven tone. Low golden sun as a warm rim light, soft cool fill. Background softly out of focus. Large-format cinema lens, shallow depth of field, fine film grain, true-to-life colour, no beauty retouching look. (Ines and the King also attach the Tomas close-up as a second reference: same look, framing, lens, lighting and grade.) The 4K file is then a local upscale, with no prompt.",
 }
