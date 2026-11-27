@@ -14,7 +14,7 @@ E = html.escape
 IMG = ROOT / "img" / "vehicles"
 FS = "in a woodland clearing south of the river, the village terraces and the castle cliff far behind"
 DL = re.search(r"^DESIGN LANGUAGE \(paste into every vehicle prompt\): (.*)$", TXT, re.M).group(1)
-P = dict(re.findall(r"^((?:QB|SB|CW|BT|GL)-[A-Z]+): (.*)$", TXT, re.M))
+P = dict(re.findall(r"^((?:QB|SB|CW|BT|GL)-[A-Z]+)(?: \([^)]*\))?: (.*)$", TXT, re.M))
 VEH = [("QB", "quad", "Hover quad", "First vehicle; zone 1"), ("SB", "scout", "Hover bike", "Fast, for the woodland paths; zone 2"),
        ("CW", "walker", "Cargo hover sled", "Glides up steps and terraces; carries Ora; zone 3"), ("BT", "boat", "Hover skiff", "Over water and land; zone 4"), ("GL", "glider", "Powered glider", "From the sea cliffs; zone 5")]
 STEPS = [("CONCEPT", "Concept"), ("SHEET", "Sheet"), ("ACTION", "In action"), ("DETAILS", "Details")]
