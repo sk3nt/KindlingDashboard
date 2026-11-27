@@ -17,6 +17,9 @@ GROUPS = [
     ("Accents: textiles and flowers", "Small, saturated, and few. In the square they cover about 8 percent of the frame.", [
         ("Cloth teal", "#0F4B52"), ("Cloth orange", "#AF571A"), ("Cloth magenta", "#8E1449"), ("Cloth mustard", "#BE8610"),
         ("Cloth blue", "#204E77"), ("Banner red", "#9A2329"), ("Bougainvillea", "#541C2D"), ("Paper lantern", "#B88E67")]),
+    ("Royal: the King and the castle", "Fixed from the King poster Steven approved on 27 November: lit cloth at dawn. Only for the King's costume, banners and the castle.", [
+        ("Royal red", "#8A311F"), ("Ruff red-orange", "#B75944"), ("Feather orange", "#E9914B"), ("Royal gold", "#BE8610"),
+        ("Royal blue", "#334B63"), ("Royal teal", "#325F63")]),
     ("Ora: the one magic colour", "Only for Ora light: Tomas's lantern, Tally's core and LED, the King's gem. Measured from the canon lantern plate.", [
         ("Ora green", "#7EE41E")]),
 ]
